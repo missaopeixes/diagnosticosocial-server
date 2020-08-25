@@ -17,6 +17,16 @@ Ele é feito pela **comunidade** e para a **comunidade**! 😆
 
 Aplicação de backend do sistema Diagnóstico Social.
 
-### Rodando local
+### Executando localmente
 
 ```npm run build && npm run start```
+
+### Executando em desenvolvimento
+
+```npm run watch```
+
+e
+
+```npm run start```
+
+Obs: em prompts separados
