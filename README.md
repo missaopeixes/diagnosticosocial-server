@@ -1,15 +1,15 @@
-# Diagnóstico social
+# App Diagnóstico Social
 
-Aplicação criada para realizar diagnósticos sociais.
+Uma iniciativa [Missão Peixes](https://www.missaopeixes.com/) 🐟 para automatização de diagnósticos sociais em comunidades de vulnerabilidade social.
 
 ## Objetivo
 
- O objetivo desse projeto é auxiliar ONG's, projetos sociais e agências missionárias a coletar dados e gerar relatórios para realizar um diagnóstico social das comunidades de atuação.
+ O objetivo desse projeto é auxiliar ONGs, projetos sociais e agências missionárias a coletar dados e gerar relatórios para realizar diagnósticos sociais das comunidades de atuação.
 
-### Contribuir
+### Contribuição
 
 Sinta-se a vontade para contribuir com esse projeto.
-Ele é feito pela comunidade e para a comunidade! 😆
+Ele é feito pela **comunidade** e para a **comunidade**! 😆
 
 ---
 
