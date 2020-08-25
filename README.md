@@ -50,6 +50,10 @@ npm run db:migrate
 npm run db:seed:all
 ```
 
+- 5 - Instale as dependencias do projeto.
+```
+npm install
+```
 
 ### Executando localmente
 
