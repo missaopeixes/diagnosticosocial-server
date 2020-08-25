@@ -42,19 +42,19 @@ Front-end para a web - [diagnosticosocial-webapp](https://github.com/missaopeixe
 }
 ```
 
-- 3 - Construa a estrutura do banco de dados.
+- 3 - Instale as dependencias do projeto.
+```
+npm install
+```
+
+- 4 - Construa a estrutura do banco de dados.
 ```
 npm run db:migrate
 ```
 
-- 4 - Popule o banco com os dados iniciais.
+- 5 - Popule o banco com os dados iniciais.
 ```
 npm run db:seed:all
-```
-
-- 5 - Instale as dependencias do projeto.
-```
-npm install
 ```
 
 ### Executando localmente
