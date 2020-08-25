@@ -1,1 +1,28 @@
+# Diagnóstico social
+
+Aplicação criada para realizar diagnósticos sociais.
+
+## Objetivo
+
+ O objetivo desse projeto é auxiliar ONG's, projetos sociais e agências missionárias a coletar dados e gerar relatórios para realizar um diagnóstico social das comunidades de atuação.
+
+### Contribuir
+
+Sinta-se a vontade para contribuir com esse projeto.
+Ele é feito pela comunidade e para a comunidade! xD
+
+---
+
 # diagnosticosocial-server
+
+Aplicação de backend do sistema Diagnóstico Social.
+
+### Rodando em dev
+
+Atualmente a execução da aplicação necessita de dois prompts de execução, um para servir a aplicação a partir do dist e outro para escutar e compilar as alterações dos arquivos.
+
+`npm run start`
+
+e
+
+`npm run watch`
