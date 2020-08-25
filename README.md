@@ -17,12 +17,6 @@ Ele é feito pela comunidade e para a comunidade! xD
 
 Aplicação de backend do sistema Diagnóstico Social.
 
-### Rodando em dev
+### Rodando local
 
-Atualmente a execução da aplicação necessita de dois prompts de execução, um para servir a aplicação a partir do dist e outro para escutar e compilar as alterações dos arquivos.
-
-`npm run start`
-
-e
-
-`npm run watch`
+```npm run build && npm run start```
