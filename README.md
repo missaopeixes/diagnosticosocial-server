@@ -9,7 +9,7 @@ Aplicação criada para realizar diagnósticos sociais.
 ### Contribuir
 
 Sinta-se a vontade para contribuir com esse projeto.
-Ele é feito pela comunidade e para a comunidade! xD
+Ele é feito pela comunidade e para a comunidade! 😆
 
 ---
 
