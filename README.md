@@ -17,16 +17,53 @@ Ele é feito pela **comunidade** e para a **comunidade**! 😆
 
 Aplicação de backend do sistema Diagnóstico Social.
 
+### Requisitos
+
+- Mysql 8+
+- Nodejs 10+
+
+### Preparando o ambiente local
+
+- 1 - Crie um novo banco no seu servidor local Mysql
+- 2 - Crie o arquivo de configuração JSON `src/database/config/db-connection.json` com a insformações da conexão. Exemplo:
+
+```json
+{
+  "development": {
+    "username": "root",
+    "password": "password",
+    "database": "database",
+    "host": "localhost",
+    "port": "3306",
+    "dialect": "mysql"
+  }
+}
+```
+
+- 3 - Construa a estrutura do banco de dados.
+```
+npm run db:migrate
+```
+
+- 4 - Popule o banco com os dados iniciais.
+```
+npm run db:seed:all
+```
+
+
 ### Executando localmente
 
-```npm run build && npm run start```
+```
+npm run build && npm run start
+```
 
 ### Executando em desenvolvimento
 
-```npm run watch```
-
-e
-
-```npm run start```
+```
+npm run watch
+```
+```
+npm run start
+```
 
 Obs: em prompts separados
