@@ -1,0 +1,53 @@
+{
+  "name": "nodeapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "gulp serve",
+    "build": "gulp scripts",
+    "watch": "gulp watch",
+    "db:compile-migrations": "gulp compile-migrations",
+    "db:migrate": "node_modules/.bin/sequelize db:migrate --options-path src/database/config/sequelize.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/body-parser": "0.0.33",
+    "@types/debug": "0.0.29",
+    "@types/jsonwebtoken": "^7.2.8",
+    "@types/morgan": "^1.7.32",
+    "@types/mysql": "^2.15.5",
+    "@types/node": "^6.0.46",
+    "@types/restify": "^7.2.1",
+    "@types/restify-cors-middleware": "^1.0.1",
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-exec": "^3.0.1",
+    "gulp-nodemon": "^2.5.0",
+    "gulp-typescript": "^5.0.0-alpha.2",
+    "reflect-metadata": "^0.1.12",
+    "sequelize-cli": "^4.1.1",
+    "sequelize-cli-typescript": "^3.2.0-c",
+    "sequelize-typescript": "^0.6.6-beta.1",
+    "typescript": "^2.9.2"
+  },
+  "dependencies": {
+    "@types/bcrypt": "^2.0.0",
+    "bcrypt": "^3.0.0",
+    "body-parser": "^1.19.0",
+    "class-validator": "^0.9.1",
+    "debug": "^3.1.0",
+    "http-status-code": "^2.1.0",
+    "morgan": "^1.9.1",
+    "mysql": "^2.15.0",
+    "mysql2": "^1.5.3",
+    "natives": "^1.1.6",
+    "restify": "^7.6.0",
+    "restify-cors-middleware": "^1.1.1",
+    "restify-jwt-community": "^1.0.7",
+    "sequelize": "^4.44.3",
+    "serve-static-restify": "^3.0.0"
+  }
+}

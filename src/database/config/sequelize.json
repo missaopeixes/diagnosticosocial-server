@@ -1,0 +1,7 @@
+{
+  "migrations-source-path": "src/database/migrations",
+  "migrations-compiled-path": "src/database/migrations/compiled",
+  "seeders-path": "src/database/seeders",
+  "models-path": "src/database/context",
+  "config": "src/database/config/db-connection.json"
+}

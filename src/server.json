@@ -1,0 +1,6 @@
+{
+    "jwt": {
+        "secret": "asdjhasdjd2312kjgkj2ge",
+        "expiresIn": "1d"
+    }
+}
