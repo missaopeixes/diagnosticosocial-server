@@ -29,10 +29,10 @@ Front-end para a web - [diagnosticosocial-webapp](https://github.com/missaopeixe
 ### Preparando o ambiente local
 
 - 1 - Instale as dependencias do projeto.
-  - Caso tenha problemas com o módulo ``bcrypt``, tente o seguinte comando: ``npm --build-from-source install bcrypt``.
 ```
 npm install
 ```
+Caso tenha problemas com o módulo ``bcrypt``, tente o seguinte comando: ``npm --build-from-source install bcrypt``.
 
 - 2 - Crie um novo banco no seu servidor local Mysql
 - 3 - Crie o arquivo de configuração JSON `src/database/config/db-connection.json` com a insformações da conexão. Nos moldes:
