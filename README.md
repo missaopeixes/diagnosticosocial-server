@@ -26,8 +26,13 @@ Front-end para a web - [diagnosticosocial-webapp](https://github.com/missaopeixe
 
 ### Preparando o ambiente local
 
-- 1 - Crie um novo banco no seu servidor local Mysql
-- 2 - Crie o arquivo de configuração JSON `src/database/config/db-connection.json` com a insformações da conexão. Exemplo:
+- 1 - Instale as dependencias do projeto.
+```
+npm install
+```
+
+- 2 - Crie um novo banco no seu servidor local Mysql
+- 3 - Crie o arquivo de configuração JSON `src/database/config/db-connection.json` com a insformações da conexão. Exemplo:
 
 ```json
 {
@@ -42,11 +47,6 @@ Front-end para a web - [diagnosticosocial-webapp](https://github.com/missaopeixe
 }
 ```
 
-- 3 - Instale as dependencias do projeto.
-```
-npm install
-```
-
 - 4 - Construa a estrutura do banco de dados.
 ```
 npm run db:migrate
@@ -56,6 +56,7 @@ npm run db:migrate
 ```
 npm run db:seed:all
 ```
+Incuindo usuário administrador padrão. Credenciais - login: admin / senha: 1234
 
 ### Executando localmente
 
