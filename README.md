@@ -23,10 +23,13 @@ Front-end para a web - [diagnosticosocial-webapp](https://github.com/missaopeixe
 
 - Mysql 8+
 - Nodejs 10+
+- Python 3.8+
+  - Certifique-se de que o diretório de instalação do Python está na variável de ambiente PATH do seu sistema.
 
 ### Preparando o ambiente local
 
 - 1 - Instale as dependencias do projeto.
+  - Caso tenha problemas com o módulo ``bcrypt``, tente o seguinte comando: ``npm --build-from-source install bcrypt``.
 ```
 npm install
 ```
@@ -56,7 +59,7 @@ npm run db:migrate
 ```
 npm run db:seed:all
 ```
-Incuindo usuário administrador padrão. Credenciais - login: admin / senha: 1234
+Incluindo usuário administrador padrão. Credenciais - login: admin / senha: 1234
 
 ### Executando localmente
 
