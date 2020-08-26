@@ -32,7 +32,7 @@ npm install
 ```
 
 - 2 - Crie um novo banco no seu servidor local Mysql
-- 3 - Crie o arquivo de configuração JSON `src/database/config/db-connection.json` com a insformações da conexão. Exemplo:
+- 3 - Crie o arquivo de configuração JSON `src/database/config/db-connection.json` com a insformações da conexão. Nos moldes:
 
 ```json
 {
