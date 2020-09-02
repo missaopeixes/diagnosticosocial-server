@@ -22,7 +22,8 @@ Front-end para a web - [diagnosticosocial-webapp](https://github.com/missaopeixe
 ### Requisitos
 
 - Mysql 8+
-- Nodejs 10+
+- Nodejs 10.22.0
+  - Atenção: nodejs 12.x.x em breve será compatível com o sistema, mas, por hora, a versão que usamos é mesmo a 10.
 - Python 3.8+
   - Certifique-se de que o diretório de instalação do Python está na variável de ambiente PATH do seu sistema.
 
