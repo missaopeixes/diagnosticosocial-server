@@ -1,5 +1,6 @@
 import { Request, Response } from 'restify';
 import { StatusServico } from '../../commom/resultado-servico';
+import { PaginacaoHttp } from '../../commom/paginacao-http';
 import { HttpUtils } from '../../utils/http-utils';
 import * as service from './questionario-service';
 import { Pergunta } from '../pergunta/pergunta-model';
@@ -23,7 +24,12 @@ export function criar(req: Request, res: Response) {
 };
 
 export function atualizar(req: Request, res: Response) {
-  service.atualizar(parseInt(req.params.id), new Questionario(
+
+  let id = parseInt(req.params.id);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+
+  service.atualizar(id, new Questionario(
     req.body.nome,
     req.body.perguntas
   )).then(resultado => {
@@ -41,7 +47,13 @@ export function atualizar(req: Request, res: Response) {
 
 export function listar(req: Request, res: Response) {
 
-  service.listar(parseInt(req.query.pagina), parseInt(req.query.itensPorPagina)).then(result => {
+  let paginacao = new PaginacaoHttp(req);
+
+  if (paginacao.temErro) {
+    return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
+  }
+
+  service.listar(paginacao.pagina, paginacao.itensPorPagina).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -71,7 +83,11 @@ export function listarTodos(req: Request, res: Response) {
 
 export function obterPerguntas(req: Request, res: Response) {
 
-  service.obterPerguntas(req.params.id).then(result => {
+  let id = parseInt(req.params.id);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+
+  service.obterPerguntas(id).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -86,7 +102,11 @@ export function obterPerguntas(req: Request, res: Response) {
 
 export function obter(req: Request, res: Response) {
 
-  service.obter(req.params.id).then(result => {
+  let id = parseInt(req.params.id);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+
+  service.obter(id).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -101,7 +121,11 @@ export function obter(req: Request, res: Response) {
 
 export function excluir(req: Request, res: Response) {
 
-  service.excluir(req.params.id).then(result => {
+  let id = parseInt(req.params.id);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+
+  service.excluir(id).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -116,8 +140,12 @@ export function excluir(req: Request, res: Response) {
 
 export function criarPergunta(req: Request, res: Response) {
 
+  let id = parseInt(req.params.id);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+
   service.criarPergunta(
-    req.params.id,
+    id,
     new Pergunta(req.body.pergunta)
   ).then(resultado => {
 
@@ -134,7 +162,13 @@ export function criarPergunta(req: Request, res: Response) {
 
 export function vincularPergunta(req: Request, res: Response) {
 
-  service.vincularPergunta(req.params.id, req.params.idPergunta).then(resultado => {
+  let id = parseInt(req.params.id);
+  let idPergunta = parseInt(req.params.idPergunta);
+  
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+  if (!Number.isInteger(idPergunta)) return res.send(400, "idPergunta deve ser um número.");
+
+  service.vincularPergunta(id, idPergunta).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);
@@ -149,7 +183,13 @@ export function vincularPergunta(req: Request, res: Response) {
 
 export function desvincularPergunta(req: Request, res: Response) {
 
-  service.desvincularPergunta(req.params.id, req.params.idPergunta).then(resultado => {
+  let id = parseInt(req.params.id);
+  let idPergunta = parseInt(req.params.idPergunta);
+  
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+  if (!Number.isInteger(idPergunta)) return res.send(400, "idPergunta deve ser um número.");
+
+  service.desvincularPergunta(id, idPergunta).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);

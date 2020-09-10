@@ -82,7 +82,7 @@ export function criar(questionario: Questionario) : Promise<ResultadoServico> {
   });
 };
 
-export function listar(pagina?: number, itensPorPagina?: number) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     db.questionarios.findAll(crudUtils.montarPaginacao(pagina, itensPorPagina)).then(resp => {

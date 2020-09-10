@@ -4,7 +4,14 @@ import { HttpUtils } from '../../utils/http-utils';
 import * as service from './auth-service';
 
 export function signin(req: Request, res: Response) {
-  service.signin(req.body.login, req.body.senha).then(resultado => {
+
+  let login = req.body.login;
+  let senha = req.body.senha;
+
+  if (typeof login !== "string") return res.send(400, "login deve ser um texto.");
+  if (typeof senha !== "string") return res.send(400, "senha deve ser um texto.");
+
+  service.signin(login, senha).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);

@@ -5,7 +5,11 @@ import * as service from './opcaoResposta-service';
 
 export function pesquisar(req: Request, res: Response) {
 
-  service.pesquisar(req.query.termo).then(result => {
+  let termo = req.query.termo;
+
+  if (typeof termo !== "string") return res.send(400, "Termo deve ser um texto.");
+
+  service.pesquisar(termo).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -20,7 +24,11 @@ export function pesquisar(req: Request, res: Response) {
 
 export function criar(req: Request, res: Response) {
 
-  service.criar(req.body.descricao).then(result => {
+  let descricao = req.body.descricao;
+
+  if (typeof descricao !== "string") return res.send(400, "Termo deve ser um texto.");
+
+  service.criar(descricao).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)

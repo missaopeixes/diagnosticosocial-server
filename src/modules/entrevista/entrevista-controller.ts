@@ -1,5 +1,6 @@
 import { Request, Response } from 'restify';
 import { StatusServico } from '../../commom/resultado-servico';
+import { PaginacaoHttp } from '../../commom/paginacao-http';
 import { HttpUtils } from '../../utils/http-utils';
 import * as service from './entrevista-service';
 import { Entrevista } from './entrevista-model';
@@ -103,7 +104,13 @@ export function atualizarQuestionarioRespondido(req: Request, res: Response) {
 
 export function excluirQuestionarioRespondido(req: Request, res: Response) {
 
-  service.excluirQuestionarioRespondido(parseInt(req.params.id), parseInt(req.params.idEntrevista)).then(result => {
+  let id = parseInt(req.params.id);
+  let idEntrevista = parseInt(req.params.idEntrevista);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+  if (!Number.isInteger(idEntrevista)) return res.send(400, "idEntrevista deve ser um número.");
+
+  service.excluirQuestionarioRespondido(id, idEntrevista).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -118,7 +125,13 @@ export function excluirQuestionarioRespondido(req: Request, res: Response) {
 
 export function obterRespostasQuestionario(req: Request, res: Response) {
 
-  service.obterRespostasQuestionario(req.params.id, req.params.idEntrevista).then(result => {
+  let id = parseInt(req.params.id);
+  let idEntrevista = parseInt(req.params.idEntrevista);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+  if (!Number.isInteger(idEntrevista)) return res.send(400, "idEntrevista deve ser um número.");
+
+  service.obterRespostasQuestionario(id, idEntrevista).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -133,9 +146,15 @@ export function obterRespostasQuestionario(req: Request, res: Response) {
 
 export function listar(req: Request, res: Response) {
 
+  let paginacao = new PaginacaoHttp(req);
+
+  if (paginacao.temErro) {
+    return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
+  }
+
   service.listar(
-    parseInt(req.query.pagina),
-    parseInt(req.query.itensPorPagina),
+    paginacao.pagina,
+    paginacao.itensPorPagina,
     req.query.filtroEvento,
     req.query.filtroUsuario,
     req.query.filtroNome,
@@ -155,7 +174,11 @@ export function listar(req: Request, res: Response) {
 
 export function obter(req: Request, res: Response) {
 
-  service.obter(req.params.id).then(result => {
+  let id = parseInt(req.params.id);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+
+  service.obter(id).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -170,7 +193,11 @@ export function obter(req: Request, res: Response) {
 
 export function excluir(req: Request, res: Response) {
 
-  service.excluir(req.params.id).then(result => {
+  let id = parseInt(req.params.id);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+
+  service.excluir(id).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)

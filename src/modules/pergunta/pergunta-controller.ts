@@ -1,5 +1,6 @@
 import { Request, Response } from 'restify';
 import { StatusServico } from '../../commom/resultado-servico';
+import { PaginacaoHttp } from '../../commom/paginacao-http';
 import { HttpUtils } from '../../utils/http-utils';
 import * as service from './pergunta-service';
 import { Pergunta } from './pergunta-model';
@@ -23,8 +24,13 @@ export function criar(req: Request, res: Response) {
 };
 
 export function atualizar(req: Request, res: Response) {
+
+  let id = parseInt(req.params.id);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+
   let obj = new Pergunta(req.body.descricao, req.body.tipoResposta, req.body.opcoesResposta);
-  obj.id = parseInt(req.params.id);
+  obj.id = id;
 
   service.atualizar(obj).then(resultado => {
 
@@ -41,7 +47,13 @@ export function atualizar(req: Request, res: Response) {
 
 export function listar(req: Request, res: Response) {
 
-  service.listar(parseInt(req.query.pagina), parseInt(req.query.itensPorPagina)).then(result => {
+  let paginacao = new PaginacaoHttp(req);
+
+  if (paginacao.temErro) {
+    return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
+  }
+
+  service.listar(paginacao.pagina, paginacao.itensPorPagina).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -56,7 +68,11 @@ export function listar(req: Request, res: Response) {
 
 export function pesquisar(req: Request, res: Response) {
 
-  service.pesquisar(req.query.termo).then(result => {
+  let termo = req.query.termo;
+
+  if (typeof termo !== "string") return res.send(400, "termo deve ser um texto.");
+
+  service.pesquisar(termo).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -71,7 +87,11 @@ export function pesquisar(req: Request, res: Response) {
 
 export function obter(req: Request, res: Response) {
 
-  service.obter(req.params.id).then(result => {
+  let id = parseInt(req.params.id);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+
+  service.obter(id).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -101,7 +121,13 @@ export function obter(req: Request, res: Response) {
 
 export function criarResposta(req: Request, res: Response) {
 
-  service.criarResposta(req.params.id, req.body.descricao).then(resultado => {
+  let id = parseInt(req.params.id);
+  let descricao = req.body.descricao;
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+  if (typeof descricao !== "string") return res.send(400, "descricao deve ser um texto.");
+
+  service.criarResposta(id, descricao).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);
@@ -116,7 +142,13 @@ export function criarResposta(req: Request, res: Response) {
 
 export function vincularResposta(req: Request, res: Response) {
 
-  service.vincularResposta(req.params.id, req.params.idOpcaoResposta).then(resultado => {
+  let id = parseInt(req.params.id);
+  let idOpcaoResposta = parseInt(req.params.idOpcaoResposta);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+  if (!Number.isInteger(idOpcaoResposta)) return res.send(400, "idOpcaoResposta deve ser um número.");
+
+  service.vincularResposta(id, idOpcaoResposta).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);
@@ -131,7 +163,13 @@ export function vincularResposta(req: Request, res: Response) {
 
 export function desvincularResposta(req: Request, res: Response) {
 
-  service.desvincularResposta(req.params.id, req.params.idOpcaoResposta).then(resultado => {
+  let id = parseInt(req.params.id);
+  let idOpcaoResposta = parseInt(req.params.idOpcaoResposta);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+  if (!Number.isInteger(idOpcaoResposta)) return res.send(400, "idOpcaoResposta deve ser um número.");
+
+  service.desvincularResposta(id, idOpcaoResposta).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);
