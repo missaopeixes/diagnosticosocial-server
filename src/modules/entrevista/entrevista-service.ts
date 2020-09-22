@@ -179,7 +179,7 @@ export function atualizarQuestionarioRespondido(questionario: QuestionarioRespon
   });
 };
 
-export function listar(pagina: number, itensPorPagina?: number, filtroEvento?: string, filtroUsuario?: string, filtroNome?: string, filtroConcluidas?: boolean) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroEvento?: string, filtroUsuario?: string, filtroNome?: string, filtroConcluidas?: boolean) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     const qtd = itensPorPagina || 15;
@@ -257,7 +257,6 @@ export function obter(id: number) : Promise<ResultadoServico> {
 
 export function excluirQuestionarioRespondido(id: number, idEntrevista: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
-
 
     db.sequelize.transaction((t: Transaction) => new Promise<ResultadoServico>((dbResolve, dbReject) => {
 

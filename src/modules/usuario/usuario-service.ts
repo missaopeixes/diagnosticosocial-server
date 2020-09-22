@@ -81,7 +81,7 @@ export function editar(idUsuario: number, nome: string, login: string, email: st
   });
 };
 
-export function listar(pagina?: number, itensPorPagina?: number) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     db.usuarios.findAll(crudUtils.montarPaginacao(pagina, itensPorPagina))

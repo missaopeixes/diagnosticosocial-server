@@ -1,21 +1,19 @@
 
-const ITENS_POR_PAGINA_DEFAULT = 15;
 
-export function montarPaginacao(pagina: number, itensPorPagina?: number) {
-  const qtd = itensPorPagina || ITENS_POR_PAGINA_DEFAULT;
+export function montarPaginacao(pagina: number, itensPorPagina: number) {
 
   return {
-    offset: (pagina - 1) * qtd,
-    limit: qtd
+    offset: (pagina - 1) * itensPorPagina,
+    limit: itensPorPagina
   };
 };
 
-export function montarConteudoPagina(lista: any[], pagina: number, itensPorPagina?: number) {
+export function montarConteudoPagina(lista: any[], pagina?: number, itensPorPagina?: number) {
 
   return {
     conteudo: lista,
     pagina: pagina,
-    itensPorPagina: itensPorPagina || ITENS_POR_PAGINA_DEFAULT,
+    itensPorPagina: itensPorPagina,
     total: 0
   }
 }

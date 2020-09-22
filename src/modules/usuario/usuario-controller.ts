@@ -1,5 +1,6 @@
 import { Request, Response } from 'restify';
 import { StatusServico } from '../../commom/resultado-servico';
+import { PaginacaoHttp } from '../../commom/paginacao-http';
 import { HttpUtils } from '../../utils/http-utils';
 import * as service from './usuario-service';
 import * as jwt from 'jsonwebtoken';
@@ -8,7 +9,18 @@ import { Usuario } from './usuario-model';
 const serverConf = require('../../server.json');
 
 export function criar(req: Request, res: Response) {
-  service.criar(req.body.nome, req.body.login, req.body.email, req.body.senha).then(resultado => {
+
+  let nome = req.body.nome;
+  let login = req.body.login;
+  let email = req.body.email;
+  let senha = req.body.senha;
+  
+  if (typeof nome !== "string") return res.send(400, "nome deve ser um texto.");
+  if (typeof login !== "string") return res.send(400, "login deve ser um texto.");
+  if (typeof email !== "string") return res.send(400, "email deve ser um texto.");
+  if (typeof senha !== "string") return res.send(400, "senha deve ser um texto.");
+
+  service.criar(nome, login, email, senha).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);
@@ -22,7 +34,18 @@ export function criar(req: Request, res: Response) {
 };
 
 export function editar(req: Request, res: Response) {
-  service.editar(parseInt(req.params.id), req.body.nome, req.body.login, req.body.email).then(resultado => {
+  
+  let id = parseInt(req.params.id);
+  let nome = req.body.nome;
+  let login = req.body.login;
+  let email = req.body.email;
+  
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número inteiro.");
+  if (typeof nome !== "string") return res.send(400, "nome deve ser um texto.");
+  if (typeof login !== "string") return res.send(400, "login deve ser um texto.");
+  if (typeof email !== "string") return res.send(400, "email deve ser um texto.");
+
+  service.editar(id, nome, login, email).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);
@@ -37,7 +60,13 @@ export function editar(req: Request, res: Response) {
 
 export function listar(req: Request, res: Response) {
 
-  service.listar(parseInt(req.query.pagina), parseInt(req.query.itensPorPagina)).then(result => {
+  let paginacao = new PaginacaoHttp(req);
+
+  if (paginacao.temErro) {
+    return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
+  }
+
+  service.listar(paginacao.pagina, paginacao.itensPorPagina).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -52,7 +81,11 @@ export function listar(req: Request, res: Response) {
 
 export function obter(req: Request, res: Response) {
 
-  service.obter(req.params.id).then(result => {
+  let id = parseInt(req.params.id);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+
+  service.obter(id).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -86,7 +119,13 @@ export function alterarSenha(req: Request, res: Response) {
   const token : string = req.headers['authorization'].toString().replace('Bearer ', '');
   const usuario = jwt.verify(token, serverConf.jwt.secret)['data'] as Usuario;
 
-  service.alterarSenha(usuario.id, req.body.senhaAtual, req.body.senhaNova).then(result => {
+  let senhaAtual = req.body.senhaAtual;
+  let senhaNova = req.body.senhaNova;
+
+  if (typeof senhaAtual !== "string") return res.send(400, "senhaAtual deve ser um texto.");
+  if (typeof senhaNova !== "string") return res.send(400, "senhaNova deve ser um texto.");
+
+  service.alterarSenha(usuario.id, senhaAtual, senhaNova).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -103,7 +142,11 @@ export function excluir(req: Request, res: Response) {
   const token : string = req.headers['authorization'].toString().replace('Bearer ', '');
   const usuario = jwt.verify(token, serverConf.jwt.secret)['data'] as Usuario;
 
-  service.excluir(parseInt(req.params.id), usuario.id).then(result => {
+  let id = parseInt(req.params.id);
+
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número inteiro.");
+
+  service.excluir(id, usuario.id).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)

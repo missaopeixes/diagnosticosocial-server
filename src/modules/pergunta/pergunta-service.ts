@@ -65,7 +65,7 @@ export function criar(pergunta: Pergunta) : Promise<ResultadoServico> {
   });
 };
 
-export function listar(pagina?: number, itensPorPagina?: number) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     db.perguntas.findAll(crudUtils.montarPaginacao(pagina, itensPorPagina)).then(resp => {

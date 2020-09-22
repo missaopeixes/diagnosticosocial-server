@@ -1,8 +1,8 @@
 import { Request, Response } from 'restify';
 import { StatusServico } from '../../commom/resultado-servico';
+import { PaginacaoHttp } from '../../commom/paginacao-http';
 import { HttpUtils } from '../../utils/http-utils';
 import * as service from '../evento/evento-service';
-import { Pergunta } from '../pergunta/pergunta-model';
 import { Evento } from '../evento/evento-model';
 import { Usuario } from '../usuario/usuario-model';
 import * as jwt from 'jsonwebtoken';
@@ -45,7 +45,13 @@ export function atualizar(req: Request, res: Response) {
 
 export function listar(req: Request, res: Response) {
 
-  service.listar(parseInt(req.query.pagina), parseInt(req.query.itensPorPagina)).then(result => {
+  let paginacao = new PaginacaoHttp(req);
+
+  if (paginacao.temErro) {
+    return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
+  }
+
+  service.listar(paginacao.pagina, paginacao.itensPorPagina).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
