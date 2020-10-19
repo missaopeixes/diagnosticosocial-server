@@ -12,11 +12,11 @@ gulp.task('assets', function() {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('scripts', ['assets'], () => {
+gulp.task('scripts', gulp.series('assets', () => {
   return gulp.src('src/**/*.ts')
     .pipe(tsMainProject())
     .pipe(gulp.dest('dist'));
-});
+}));
 
 gulp.task('compile-migrations', () => {
   gulp.src('src/database/migrations/*.ts')
@@ -24,9 +24,9 @@ gulp.task('compile-migrations', () => {
     .pipe(gulp.dest('src/database/migrations/compiled'));
 });
 
-gulp.task('watch', ['scripts'], () => {
+gulp.task('watch', gulp.series('scripts', () => {
   gulp.watch('src/**/*.ts', ['scripts']);
-});
+}));
 
 gulp.task('serve', (cb) => {
   nodemon({
@@ -35,4 +35,4 @@ gulp.task('serve', (cb) => {
   });
 });
 
-gulp.task('default', ['scripts']);
+gulp.task('default', gulp.series('scripts'));
