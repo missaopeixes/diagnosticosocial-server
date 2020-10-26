@@ -47,6 +47,7 @@
     "mysql": "^2.15.0",
     "mysql2": "^1.5.3",
     "natives": "^1.1.6",
+    "nodemailer": "^6.4.14",
     "restify": "^7.6.0",
     "restify-cors-middleware": "^1.1.1",
     "restify-jwt-community": "^1.0.7",

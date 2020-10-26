@@ -25,7 +25,7 @@ gulp.task('compile-migrations', () => {
 });
 
 gulp.task('watch', gulp.series('scripts', () => {
-  gulp.watch('src/**/*.ts', ['scripts']);
+  gulp.watch('src/**/*.ts', gulp.series('scripts'));
 }));
 
 gulp.task('serve', (cb) => {

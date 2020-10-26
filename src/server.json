@@ -2,5 +2,9 @@
     "jwt": {
         "secret": "asdjhasdjd2312kjgkj2ge",
         "expiresIn": "1d"
+    },
+    "jwtNewPass": {
+        "secret": "abzktkp93f2kjgkjrm4goe",
+        "expiresIn": "1h"
     }
 }

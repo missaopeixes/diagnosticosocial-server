@@ -73,7 +73,7 @@ export function editar(idUsuario: number, nome: string, login: string, email: st
           nome: usuario.nome,
           login: usuario.login,
           email: usuario.email
-        }, {where: {id: idUsuario}}).then(resp => resolve(new ResultadoServico(resp))); 
+        }, {where: {id: idUsuario}}).then(resp => resolve(new ResultadoServico(resp)));
       })
       .catch(err => reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao)));
 
@@ -142,6 +142,30 @@ export function excluir(id: number, idUsuarioSessao: number) : Promise<Resultado
       reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
     });
   })
+};
+
+export function recuperarSenha(idUsuario: number, senha: string) : Promise<ResultadoServico> {
+  return new Promise((resolve, reject) => {
+
+    db.usuarios.findOne({where: {id: idUsuario}}).then((obj) => {
+      if (!obj) return resolve(new ResultadoServico('Usuário inexistente!', StatusServico.Erro));
+
+      bcrypt.hash(senha, PASSWORD_SALT_ROUNDS, (err, hash) => {
+
+        if (err) {
+          return resolve(new ResultadoServico(["Erro"], StatusServico.Erro, TipoErro.Excecao));
+        }
+
+        senha = hash;
+
+        db.usuarios.update({
+          senha: senha
+        }, {where: {id: idUsuario}}).then(resp => resolve(new ResultadoServico(resp))); 
+      });
+    })
+    .catch(err => reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao)));
+
+  });
 };
 
 export function alterarSenha(idUsuario: number, senhaAtual: string, novaSenha: string) : Promise<ResultadoServico> {
