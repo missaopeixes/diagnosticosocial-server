@@ -77,7 +77,7 @@ export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroDe
     }
 
     if (!!filtroDescricao) {
-      filtro += (filtroNaoUtilizadas ? ' WHERE' : ' AND') + ` p.descricao LIKE '%${filtroDescricao}%'`;
+      filtro += (filtroNaoUtilizadas ? ' AND' : ' WHERE') + ` p.descricao LIKE '%${filtroDescricao}%'`;
     }
 
     const queryRaw = `
