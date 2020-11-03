@@ -47,11 +47,8 @@ export function atualizar(req: Request, res: Response) {
 
 export function listar(req: Request, res: Response) {
 
-  if (req.query.filtroUtilizadas == "true"){
-    req.query.filtroUtilizadas = true;
-  }else{
-    req.query.filtroUtilizadas = false;
-  }
+  req.query.filtroUtilizadas = req.query.filtroUtilizadas === "true";
+
   if (req.query.filtroDescricao === undefined){
     req.query.filtroDescricao = '';
   }
