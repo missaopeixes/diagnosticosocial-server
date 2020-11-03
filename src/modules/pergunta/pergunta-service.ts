@@ -65,33 +65,30 @@ export function criar(pergunta: Pergunta) : Promise<ResultadoServico> {
   });
 };
 
-export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroDescricao?: string, filtroUtilizadas?: boolean) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroDescricao?: string, filtroNaoUtilizadas?: boolean) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     const qtd = itensPorPagina || 15;
 
     let filtro = '';
+
+    if (filtroNaoUtilizadas) {
+      filtro += 'LEFT JOIN questionarioperguntas qp ON p.id = qp.idPergunta WHERE qp.id IS NULL';
+    }
+
     if (!!filtroDescricao) {
-      filtro = `WHERE p.descricao LIKE '%${filtroDescricao}%'`;
+      filtro += (filtroNaoUtilizadas ? ' WHERE' : ' AND') + ` p.descricao LIKE '%${filtroDescricao}%'`;
     }
 
-    let queryBody = `FROM perguntas p ${filtro}
+    const queryRaw = `
+      SELECT p.* FROM perguntas p
+      ${filtro}
       GROUP BY p.id
-      ORDER BY p.createdAt DESC`;
-    let queryBodyCount = `FROM perguntas p ${filtro}
-      ORDER BY p.createdAt DESC`;
-    if (filtroUtilizadas) {
-      queryBody = `FROM perguntas p
-        INNER JOIN questionarioperguntas qp ON p.id = qp.idPergunta ${filtro}
-        GROUP BY p.id
-        ORDER BY p.createdAt DESC`;
-      queryBodyCount = `FROM perguntas p
-        INNER JOIN questionarioperguntas qp ON p.id = qp.idPergunta ${filtro}
-        ORDER BY p.createdAt DESC`;
-    }
-
-    const queryRaw = `SELECT p.* ${queryBody} LIMIT ${(pagina - 1) * qtd}, ${qtd};`;
-    const queryCount = `SELECT COUNT(DISTINCT p.id) as total ${queryBodyCount}`;
+      ORDER BY p.createdAt DESC
+      LIMIT ${(pagina - 1) * qtd}, ${qtd};`;
+    const queryCount = `
+      SELECT COUNT(DISTINCT p.id) as total FROM perguntas p
+      ${filtro}`;
 
     db.sequelize.query(queryRaw, { model: db.perguntas })
     .then(data => crudUtils.montarConteudoPagina(data, pagina, itensPorPagina))
