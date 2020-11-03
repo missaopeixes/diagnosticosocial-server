@@ -47,7 +47,7 @@ export function atualizar(req: Request, res: Response) {
 
 export function listar(req: Request, res: Response) {
 
-  req.query.filtroUtilizadas = req.query.filtroUtilizadas === "true";
+  req.query.filtroNaoUtilizadas = req.query.filtroNaoUtilizadas === "true";
 
   if (req.query.filtroDescricao === undefined){
     req.query.filtroDescricao = '';
@@ -63,7 +63,7 @@ export function listar(req: Request, res: Response) {
     paginacao.pagina,
     paginacao.itensPorPagina,
     req.query.filtroDescricao,
-    req.query.filtroUtilizadas
+    req.query.filtroNaoUtilizadas
     ).then(result => {
 
     if (result.status === StatusServico.Erro) {
