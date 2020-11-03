@@ -1,5 +1,5 @@
 
-import { MaxLength, validate, IsEmail } from 'class-validator';
+import { MaxLength, validate, IsEmail, IsBoolean } from 'class-validator';
 import { BaseModel } from '../../commom/base-model';
 
 export class Usuario extends BaseModel {
@@ -16,6 +16,9 @@ export class Usuario extends BaseModel {
 
   @MaxLength(50)
   senha: string;
+
+  @IsBoolean({message: 'O campo administrador deve ser um boolean'})
+  administrador: boolean;
 
   constructor(){
     super();

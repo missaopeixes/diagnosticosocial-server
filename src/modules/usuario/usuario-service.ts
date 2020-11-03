@@ -1,4 +1,3 @@
-
 import db from '../../database/db-connection';
 import { Usuario } from './usuario-model';
 import { ResultadoServico, StatusServico, TipoErro } from '../../commom/resultado-servico';
@@ -7,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 
 const PASSWORD_SALT_ROUNDS = 10;
 
-export function criar(nome: string, login: string, email: string, senha: string) : Promise<ResultadoServico> {
+export function criar(nome: string, login: string, email: string, senha: string, administrador: boolean) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
     
     const usuario = new Usuario();
@@ -15,6 +14,7 @@ export function criar(nome: string, login: string, email: string, senha: string)
     usuario.login = login;
     usuario.email = email;
     usuario.senha = senha;
+    usuario.administrador = administrador;
 
     usuario.validar().then(erros => {
 
@@ -47,11 +47,12 @@ export function criar(nome: string, login: string, email: string, senha: string)
         reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
       });
 
-    });
+    })
+    .catch(err => reject(new ResultadoServico(err)));
   });
 };
 
-export function editar(idUsuario: number, nome: string, login: string, email: string) : Promise<ResultadoServico> {
+export function editar(idUsuario: number, nome: string, login: string, email: string, administrador: boolean) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
     
     const usuario = new Usuario();
@@ -59,6 +60,7 @@ export function editar(idUsuario: number, nome: string, login: string, email: st
     usuario.nome = nome;
     usuario.login = login;
     usuario.email = email;
+    usuario.administrador = administrador;
 
     usuario.validar().then(erros => {
 
