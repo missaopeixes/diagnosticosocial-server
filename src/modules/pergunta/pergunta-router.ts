@@ -9,6 +9,7 @@ export function aplicarRotas(base: string, server: Server) {
   server.get(`${base}/perguntas/pesquisa`, controller.pesquisar);
   server.get(`${base}/perguntas/:id`, controller.obter);
   server.put(`${base}/perguntas/:id`, controller.atualizar);
+  server.del(`${base}/perguntas/:id`, controller.excluir);
 
   server.post(`${base}/perguntas/:id/opcoes-resposta`, controller.criarResposta);
 
