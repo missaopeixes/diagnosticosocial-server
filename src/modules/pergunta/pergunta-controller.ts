@@ -47,13 +47,27 @@ export function atualizar(req: Request, res: Response) {
 
 export function listar(req: Request, res: Response) {
 
+  if (req.query.filtroUtilizadas == "true"){
+    req.query.filtroUtilizadas = true;
+  }else{
+    req.query.filtroUtilizadas = false;
+  }
+  if (req.query.filtroDescricao === undefined){
+    req.query.filtroDescricao = '';
+  }
+
   let paginacao = new PaginacaoHttp(req);
 
   if (paginacao.temErro) {
     return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
   }
 
-  service.listar(paginacao.pagina, paginacao.itensPorPagina).then(result => {
+  service.listar(
+    paginacao.pagina,
+    paginacao.itensPorPagina,
+    req.query.filtroDescricao,
+    req.query.filtroUtilizadas
+    ).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -104,20 +118,24 @@ export function obter(req: Request, res: Response) {
   });
 };
 
-// export function excluir(req: Request, res: Response) {
+export function excluir(req: Request, res: Response) {
 
-//   service.excluir(req.params.id).then(result => {
+  let id = parseInt(req.params.id);
 
-//     if (result.status === StatusServico.Erro) {
-//       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
-//     }
+  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
 
-//     res.send(204);
-//   })
-//   .catch(err => {
-//     res.send(500, err);
-//   });
-// };
+  service.excluir(req.params.id).then(result => {
+
+    if (result.status === StatusServico.Erro) {
+      return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
+    }
+
+    res.send(200, result.conteudo);
+  })
+  .catch(err => {
+    res.send(500, err);
+  });
+};
 
 export function criarResposta(req: Request, res: Response) {
 

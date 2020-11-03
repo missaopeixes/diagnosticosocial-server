@@ -65,16 +65,39 @@ export function criar(pergunta: Pergunta) : Promise<ResultadoServico> {
   });
 };
 
-export function listar(pagina: number = 1, itensPorPagina: number = 15) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroDescricao?: string, filtroUtilizadas?: boolean) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
-    db.perguntas.findAll(crudUtils.montarPaginacao(pagina, itensPorPagina)).then(resp => {
+    const qtd = itensPorPagina || 15;
 
-      return crudUtils.montarConteudoPagina(resp, pagina, itensPorPagina);
-    })
-    .then((resultado) => {
-      db.perguntas.count().then((count) => {
-        resultado.total = count;
+    let filtro = '';
+    if (!!filtroDescricao) {
+      filtro = `WHERE p.descricao LIKE '%${filtroDescricao}%'`;
+    }
+
+    let queryBody = `FROM perguntas p ${filtro}
+      GROUP BY p.id
+      ORDER BY p.createdAt DESC`;
+    let queryBodyCount = `FROM perguntas p ${filtro}
+      ORDER BY p.createdAt DESC`;
+    if (filtroUtilizadas) {
+      queryBody = `FROM perguntas p
+        INNER JOIN questionarioperguntas qp ON p.id = qp.idPergunta ${filtro}
+        GROUP BY p.id
+        ORDER BY p.createdAt DESC`;
+      queryBodyCount = `FROM perguntas p
+        INNER JOIN questionarioperguntas qp ON p.id = qp.idPergunta ${filtro}
+        ORDER BY p.createdAt DESC`;
+    }
+
+    const queryRaw = `SELECT p.* ${queryBody} LIMIT ${(pagina - 1) * qtd}, ${qtd};`;
+    const queryCount = `SELECT COUNT(DISTINCT p.id) as total ${queryBodyCount}`;
+
+    db.sequelize.query(queryRaw, { model: db.perguntas })
+    .then(data => crudUtils.montarConteudoPagina(data, pagina, itensPorPagina))
+    .then(resultado => {
+      return db.sequelize.query(queryCount, {raw: true}).then((resp) => {
+        resultado.total = resp[0][0]['total'];
         return resolve(new ResultadoServico(resultado));
       });
     })
@@ -195,34 +218,71 @@ export function atualizar(pergunta: Pergunta) : Promise<ResultadoServico> {
   });
 };
 
-// export function excluir(id: number) : Promise<ResultadoServico> {
-//   return new Promise((resolve, reject) => {
+export function excluir(id: number) : Promise<ResultadoServico> {
+  return new Promise((resolve, reject) => {
 
-//     db.questionarios.findOne({
-//       where: {
-//         id: id
-//       }
-//     })
-//     .then(questionario => {
+    db.sequelize.transaction((t: Transaction) => new Promise<ResultadoServico>((dbResolve, dbReject) => {
 
-//       if (!questionario) {
-//         return resolve(new ResultadoServico('Questionário não encontrado', StatusServico.Erro));
-//       }
-      
-//       db.questionarios.destroy({
-//         where: {
-//           id: questionario.id
-//         }
-//       })
-//       .then(resp => {
-//         resolve(new ResultadoServico(resp));
-//       })
-//     })
-//     .catch(err => {
-//       reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
-//     });
-//   })
-// };
+      db.perguntas.findOne({
+        where: {
+          id: id
+        }
+      })
+      .then(pergunta => {
+
+        if (!pergunta) {
+          return dbResolve(new ResultadoServico('Pergunta não encontrada', StatusServico.Erro));
+        }
+
+        let queryBody = `FROM questionarioperguntas qp LEFT JOIN questionariosrespondidos qr ON qr.idquestionario = qp.idquestionario
+        WHERE qp.idpergunta = ${pergunta.id}
+        GROUP BY qp.idpergunta`
+
+        const queryRaw = `SELECT qr.identrevista, qp.idquestionario, qp.idpergunta ${queryBody};`;
+
+        db.sequelize.query(queryRaw, { model: db.questionarioPerguntas })
+        .then((result) => {
+          
+          if (result.length > 0) {
+            if (result[0].dataValues.identrevista != null) {
+              return dbResolve(new ResultadoServico('Essa pergunta já foi utilizada em uma entrevista. Não é mais possível excluí-la.', StatusServico.Erro));
+            }
+            if (result[0].dataValues.idquestionario != null){
+              return dbResolve(new ResultadoServico('Essa pergunta está vinculada a um questionário. Remova-a do questionário antes de excluí-la.', StatusServico.Erro));
+            }
+          }
+          else {
+            db.perguntasOpcoesResposta.destroy({
+              where: {
+                idpergunta: pergunta.id
+              },
+              transaction: t
+            })
+            .then(resp => {
+              db.perguntas.destroy({
+                where: {
+                  id: pergunta.id
+                },
+                transaction: t
+              })
+              .then(resp => {
+                dbResolve(new ResultadoServico("Pergunta excluída com sucesso."));
+              });
+            });
+          }
+        })
+        .catch(err => {
+          console.log("ERRO!", err);
+          dbReject(err);
+        });
+      });
+    })
+    .then((resultado) => resolve(resultado))
+    .catch(err => {
+      reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
+    }));
+  });
+};
 
 export function vincularResposta(idPergunta: number, idOpcaoResposta: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
