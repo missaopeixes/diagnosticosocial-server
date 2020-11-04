@@ -7,6 +7,7 @@ const JWT_SECRET = 'asdjhasdjd2312kjgkj2ge';
 export function aplicarRotas(base: string, server: Server) {
 
   server.post(`${base}/auth`, controller.signin);
+  
   server.post(`${base}/auth/solicitacao`, controller.solicitarNovaSenha);
   server.get(`${base}/auth/validacao`, controller.validarSolicitacao);
   server.put(`${base}/auth/alteracaoDeSenha`, controller.alterarSenha);
