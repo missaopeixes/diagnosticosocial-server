@@ -14,13 +14,9 @@ export function criar(req: Request, res: Response) {
   let login = req.body.login;
   let email = req.body.email;
   let senha = req.body.senha;
+  let administrador = req.body.administrador;
   
-  if (typeof nome !== "string") return res.send(400, "nome deve ser um texto.");
-  if (typeof login !== "string") return res.send(400, "login deve ser um texto.");
-  if (typeof email !== "string") return res.send(400, "email deve ser um texto.");
-  if (typeof senha !== "string") return res.send(400, "senha deve ser um texto.");
-
-  service.criar(nome, login, email, senha).then(resultado => {
+  service.criar(nome, login, email, senha, administrador).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);
@@ -39,13 +35,11 @@ export function editar(req: Request, res: Response) {
   let nome = req.body.nome;
   let login = req.body.login;
   let email = req.body.email;
+  let administrador = req.body.administrador;
   
-  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número inteiro.");
-  if (typeof nome !== "string") return res.send(400, "nome deve ser um texto.");
-  if (typeof login !== "string") return res.send(400, "login deve ser um texto.");
-  if (typeof email !== "string") return res.send(400, "email deve ser um texto.");
+  if (!Number.isInteger(id)) return res.send(400, "O id deve ser um número inteiro.");
 
-  service.editar(id, nome, login, email).then(resultado => {
+  service.editar(id, nome, login, email, administrador).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);
@@ -83,7 +77,7 @@ export function obter(req: Request, res: Response) {
 
   let id = parseInt(req.params.id);
 
-  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+  if (!Number.isInteger(id)) return res.send(400, "O id deve ser um número.");
 
   service.obter(id).then(result => {
 
@@ -144,7 +138,7 @@ export function excluir(req: Request, res: Response) {
 
   let id = parseInt(req.params.id);
 
-  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número inteiro.");
+  if (!Number.isInteger(id)) return res.send(400, "O id deve ser um número inteiro.");
 
   service.excluir(id, usuario.id).then(result => {
 

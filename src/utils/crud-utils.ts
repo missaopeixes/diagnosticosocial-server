@@ -1,5 +1,3 @@
-
-
 export function montarPaginacao(pagina: number, itensPorPagina: number) {
 
   return {
