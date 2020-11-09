@@ -74,7 +74,8 @@ export function editar(idUsuario: number, nome: string, login: string, email: st
         db.usuarios.update({
           nome: usuario.nome,
           login: usuario.login,
-          email: usuario.email
+          email: usuario.email,
+          administrador: usuario.administrador
         }, {where: {id: idUsuario}}).then(resp => resolve(new ResultadoServico(resp)));
       })
       .catch(err => reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao)));

@@ -1,5 +1,6 @@
 
-import { MaxLength, IsDefined } from 'class-validator';
+import { MaxLength, IsDefined, IsString } from 'class-validator';
+import { Is } from 'sequelize-typescript';
 import { BaseModel } from '../../commom/base-model';
 import { Questionario } from '../questionario/questionario-model';
 
@@ -18,7 +19,8 @@ export class QuestionarioDoEvento {
 export class Evento extends BaseModel {
 
   @IsDefined({message: 'O campo nome é obrigatório.'})
-  @MaxLength(255, {message: 'O nome deve ter no máximo 255 caracteres.'})
+  @MaxLength(255, {message: 'O campo nome deve ter no máximo 255 caracteres.'})
+  @IsString({message: 'O campo nome deve conter um texto.'})
   nome: string;
 
   @IsDefined({message: 'O campo questionarios é obrigatório.'})

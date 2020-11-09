@@ -1,5 +1,5 @@
 
-import { MaxLength, IsDefined } from 'class-validator';
+import { MaxLength, IsDefined, IsNumber, IsString } from 'class-validator';
 import { BaseModel } from '../../commom/base-model';
 import { Pergunta } from '../pergunta/pergunta-model';
 import { Resposta } from '../resposta/resposta-model';
@@ -22,9 +22,13 @@ export class Questionario extends BaseModel {
 
 export class QuestionarioRespondido extends BaseModel {
 
+  @IsNumber()
   idEntrevista: number;
+  @IsNumber()
   idQuestionario: number;
 
+  @MaxLength(500, {message: 'O campo observações deve ter no máximo 500 caracteres.'})
+  @IsString({message: 'O campo observações deve conter um texto.'})
   observacoes: string;
 
   respostas: Resposta[];

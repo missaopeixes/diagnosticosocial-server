@@ -107,8 +107,8 @@ export function excluirQuestionarioRespondido(req: Request, res: Response) {
   let id = parseInt(req.params.id);
   let idEntrevista = parseInt(req.params.idEntrevista);
 
-  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
-  if (!Number.isInteger(idEntrevista)) return res.send(400, "idEntrevista deve ser um número.");
+  if (!Number.isInteger(id)) return res.send(400, "O campo id deve ser um número.");
+  if (!Number.isInteger(idEntrevista)) return res.send(400, "O campo idEntrevista deve ser um número.");
 
   service.excluirQuestionarioRespondido(id, idEntrevista).then(result => {
 
@@ -128,8 +128,8 @@ export function obterRespostasQuestionario(req: Request, res: Response) {
   let id = parseInt(req.params.id);
   let idEntrevista = parseInt(req.params.idEntrevista);
 
-  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
-  if (!Number.isInteger(idEntrevista)) return res.send(400, "idEntrevista deve ser um número.");
+  if (!Number.isInteger(id)) return res.send(400, "O campo id deve ser um número.");
+  if (!Number.isInteger(idEntrevista)) return res.send(400, "O campo idEntrevista deve ser um número.");
 
   service.obterRespostasQuestionario(id, idEntrevista).then(result => {
 
@@ -176,7 +176,7 @@ export function obter(req: Request, res: Response) {
 
   let id = parseInt(req.params.id);
 
-  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+  if (!Number.isInteger(id)) return res.send(400, "O campo id deve ser um número.");
 
   service.obter(id).then(result => {
 
@@ -195,7 +195,7 @@ export function excluir(req: Request, res: Response) {
 
   let id = parseInt(req.params.id);
 
-  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
+  if (!Number.isInteger(id)) return res.send(400, "O campo id deve ser um número.");
 
   service.excluir(id).then(result => {
 
