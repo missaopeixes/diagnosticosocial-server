@@ -72,7 +72,7 @@ export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroDe
     let filtro = '';
 
     if (filtroNaoUtilizadas) {
-      filtro += 'LEFT JOIN questionarioperguntas qp ON p.id = qp.idPergunta WHERE qp.id IS NULL';
+      filtro += 'LEFT JOIN questionarioPerguntas qp ON p.id = qp.idPergunta WHERE qp.id IS NULL';
     }
 
     if (!!filtroDescricao) {
@@ -230,7 +230,7 @@ export function excluir(id: number) : Promise<ResultadoServico> {
           return dbResolve(new ResultadoServico('Pergunta não encontrada', StatusServico.Erro));
         }
 
-        let queryBody = `FROM questionarioperguntas qp LEFT JOIN questionariosrespondidos qr ON qr.idquestionario = qp.idquestionario
+        let queryBody = `FROM questionarioPerguntas qp LEFT JOIN questionariosRespondidos qr ON qr.idquestionario = qp.idquestionario
         WHERE qp.idpergunta = ${pergunta.id}
         GROUP BY qp.idpergunta`
 
@@ -268,7 +268,6 @@ export function excluir(id: number) : Promise<ResultadoServico> {
           }
         })
         .catch(err => {
-          console.log("ERRO!", err);
           dbReject(err);
         });
       });
