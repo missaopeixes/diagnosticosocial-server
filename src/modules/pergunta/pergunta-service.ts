@@ -1,4 +1,3 @@
-
 import db from '../../database/db-connection';
 import { Pergunta, OpcaoDaPergunta } from './pergunta-model';
 import { ResultadoServico, StatusServico, TipoErro } from '../../commom/resultado-servico';

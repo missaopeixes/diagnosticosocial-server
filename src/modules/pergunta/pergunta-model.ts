@@ -11,10 +11,11 @@ export class OpcaoDaPergunta {
 
 export class Pergunta extends BaseModel {
 
+  @IsNumber()
   id: number;
 
   @IsDefined({message: 'O campo descrição é obrigatório.'})
-  @MaxLength(255, {message: 'O descrição deve ter no máximo 255 caracteres.'})
+  @MaxLength(255, {message: 'O campo descrição deve ter no máximo 255 caracteres.'})
   descricao: string;
 
   @IsDefined({message: 'O campo tipo de resposta é obrigatório.'})
