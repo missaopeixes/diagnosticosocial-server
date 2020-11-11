@@ -104,12 +104,13 @@ export function salvarQuestionarioRespondido(questionario: QuestionarioRespondid
           return dbResolve(new ResultadoServico(erros, StatusServico.Erro));
         }
 
-        db.questionariosRespondidos.create(questionario, {transaction: t}).then(resp => {
+        return db.questionariosRespondidos.create(questionario, {transaction: t}).then(resp => {
+
           questionario.respostas.forEach((r) => {
             r.idQuestionarioRespondido = resp.id;
           });
 
-          db.respostas.bulkCreate(questionario.respostas, {transaction: t}).then(() => {
+          return db.respostas.bulkCreate(questionario.respostas, {transaction: t}).then(() => {
             dbResolve(new ResultadoServico(resp));
           })
         });

@@ -37,7 +37,7 @@ export class QuestionarioRespondido extends BaseModel {
     super();
     this.idEntrevista = idEntrevista;
     this.idQuestionario = idQuestionario;
-    this.observacoes = observacoes || null;
+    this.observacoes = observacoes ? observacoes : '';
     this.respostas = respostas || [];
     if (id) {
       this.id = id;

@@ -226,7 +226,7 @@ export function importar() : Promise<ResultadoServico> {
 
               const salvandoEntrevistas = processo.importacao.entrevistas.map(e => {
                 return _criarEntrevista(new Entrevista(sistema.evento, obterUsuario(processo.missionario), e.nomeEntrevistado), db, t).then(entrevistaCadastrada => {
-                  const idEntrevista = entrevistaCadastrada.conteudo.id;
+                  const idEntrevista = parseInt(entrevistaCadastrada.conteudo.id);
 
                   const salvandoQuestionarios = e.questionarios.map(q => {
                     return _criarQuestionarioRespondido(new QuestionarioRespondido(idEntrevista, q.idQuestionario), db, t).then(qRespondidoCadastrado => {

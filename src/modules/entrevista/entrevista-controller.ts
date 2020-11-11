@@ -64,7 +64,7 @@ export function atualizar(req: Request, res: Response) {
 export function salvarQuestionarioRespondido(req: Request, res: Response) {
 
   service.salvarQuestionarioRespondido(new QuestionarioRespondido(
-    req.params.idEntrevista,
+    parseInt(req.params.idEntrevista),
     req.body.idQuestionario,
     req.body.respostas,
     req.body.observacoes,
@@ -82,9 +82,8 @@ export function salvarQuestionarioRespondido(req: Request, res: Response) {
 };
 
 export function atualizarQuestionarioRespondido(req: Request, res: Response) {
-
   service.atualizarQuestionarioRespondido(new QuestionarioRespondido(
-    req.params.idEntrevista,
+    parseInt(req.params.idEntrevista),
     req.body.idQuestionario,
     req.body.respostas,
     req.body.observacoes,
