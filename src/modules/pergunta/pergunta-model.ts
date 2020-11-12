@@ -11,7 +11,6 @@ export class OpcaoDaPergunta {
 
 export class Pergunta extends BaseModel {
 
-  @IsNumber()
   id: number;
 
   @IsDefined({message: 'O campo descrição é obrigatório.'})
@@ -23,7 +22,7 @@ export class Pergunta extends BaseModel {
 
   opcoesResposta: OpcaoResposta[];
 
-  constructor(descricao: string, tipo = TipoResposta.MultiplaEscolha, opcoes: OpcaoResposta[] = []){
+  constructor(descricao: string, tipo: TipoResposta = TipoResposta.MultiplaEscolha, opcoes: OpcaoResposta[] = []){
     super();
     this.descricao = descricao;
     this.tipoResposta = tipo;

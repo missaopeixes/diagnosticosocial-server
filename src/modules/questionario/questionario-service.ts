@@ -392,9 +392,8 @@ export function criarPergunta(idQuestionario: number, pergunta: Pergunta) : Prom
 
       perguntaService.criar(pergunta).then(resultadoNovaPergunta => {
 
-        return vincularPergunta(questionario.id, resultadoNovaPergunta.conteudo.id)
+        return vincularPergunta(questionario.id, parseInt(resultadoNovaPergunta.conteudo.id))
         .then(() => {
-
           resolve(resultadoNovaPergunta);
         });
       })
