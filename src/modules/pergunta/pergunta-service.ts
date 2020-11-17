@@ -42,12 +42,18 @@ export function criar(pergunta: Pergunta) : Promise<ResultadoServico> {
   
               return db.perguntasOpcoesResposta.bulkCreate(vinculos, {transaction: t}).then(() => {
                 dbResolve(new ResultadoServico(resp));
-              });
+              })
+              .catch(err => {
+                dbReject(err);
+              })
             }
             else {
               dbResolve(new ResultadoServico(resp));
             }
-          });
+          })
+          .catch(err => {
+            dbReject(err);
+          })
         });
       })
       .catch(err => {
@@ -230,27 +236,26 @@ export function excluir(id: number) : Promise<ResultadoServico> {
           return dbResolve(new ResultadoServico('Pergunta não encontrada', StatusServico.Erro));
         }
 
-        let queryBody = `FROM questionarioPerguntas qp LEFT JOIN questionariosRespondidos qr ON qr.idquestionario = qp.idquestionario
-        WHERE qp.idpergunta = ${pergunta.id}
-        GROUP BY qp.idpergunta`
+        let queryBody = `FROM questionarioPerguntas qp LEFT JOIN questionariosRespondidos qr ON qr.idQuestionario = qp.idQuestionario
+        WHERE qp.idPergunta = ${pergunta.id}
+        GROUP BY qp.idPergunta`
 
-        const queryRaw = `SELECT qr.identrevista, qp.idquestionario, qp.idpergunta ${queryBody};`;
+        const queryRaw = `SELECT qr.idEntrevista, qp.idQuestionario, qp.idPergunta ${queryBody};`;
 
         db.sequelize.query(queryRaw, { model: db.questionarioPerguntas })
         .then((result) => {
-          
           if (result.length > 0) {
-            if (result[0].dataValues.identrevista != null) {
+            if (result[0].dataValues.idEntrevista != null) {
               return dbResolve(new ResultadoServico('Essa pergunta já foi utilizada em uma entrevista. Não é mais possível excluí-la.', StatusServico.Erro));
             }
-            if (result[0].dataValues.idquestionario != null){
+            if (result[0].dataValues.idQuestionario != null){
               return dbResolve(new ResultadoServico('Essa pergunta está vinculada a um questionário. Remova-a do questionário antes de excluí-la.', StatusServico.Erro));
             }
           }
           else {
             db.perguntasOpcoesResposta.destroy({
               where: {
-                idpergunta: pergunta.id
+                idPergunta: pergunta.id
               },
               transaction: t
             })
@@ -270,6 +275,9 @@ export function excluir(id: number) : Promise<ResultadoServico> {
         .catch(err => {
           dbReject(err);
         });
+      })
+      .catch(err => {
+        dbReject(err);
       });
     })
     .then((resultado) => resolve(resultado))

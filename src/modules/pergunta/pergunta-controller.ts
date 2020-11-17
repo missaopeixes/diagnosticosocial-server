@@ -6,6 +6,7 @@ import * as service from './pergunta-service';
 import { Pergunta } from './pergunta-model';
 
 export function criar(req: Request, res: Response) {
+
   service.criar(new Pergunta(
     req.body.descricao,
     req.body.tipoResposta,
