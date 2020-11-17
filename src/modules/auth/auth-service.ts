@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 
 import { Usuario } from '../usuario/usuario-model';
 import { recuperarSenha } from '../usuario/usuario-service';
+import { Auth } from './auth-model';
 
 var nodemailer = require('nodemailer');
 
@@ -32,8 +33,15 @@ export function signin(login: string, senha: string) : Promise<ResultadoServico>
         }
 
         const token = jwt.sign({data: resp}, serverConf.jwt.secret, {expiresIn: serverConf.jwt.expiresIn});
-  
-        resolve(new ResultadoServico({login, nome: resp.nome, token, validade: serverConf.jwt.expiresIn}));
+
+        resolve(new ResultadoServico(new Auth({
+          login,
+          id: resp.id,
+          nome: resp.nome,
+          administrador: resp.administrador,
+          validade: serverConf.jwt.expiresIn,
+          token
+        })));
       });
     })
     .catch(err => {
@@ -130,7 +138,7 @@ export function solicitarNovaSenha(email: string) : Promise<ResultadoServico> {
               </div>
             </div>`
       };
-      
+
       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
           reject(new ResultadoServico(error, StatusServico.Erro, TipoErro.Excecao));

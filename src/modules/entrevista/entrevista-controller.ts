@@ -38,17 +38,11 @@ export function atualizar(req: Request, res: Response) {
   const token : string = req.headers['authorization'].toString().replace('Bearer ', '');
   const usuario = jwt.verify(token, serverConf.jwt.secret)['data'] as Usuario;
 
-  let obj = new Entrevista(
-    req.body.idEvento,
-    usuario.id,
-    req.body.nome,
-    req.body.respostas,
-    req.body.observacoes,
-    req.body.concluida
-  );
-  obj.id = parseInt(req.params.id);
+  if (!Number.isInteger(req.body.id)) return res.send(400, "O campo id deve ser um número.");
+  if (typeof req.body.nome !== "string") return res.send(400, "O campo nome deve ser um texto.");
+  if (typeof req.body.concluida !== "boolean") return res.send(400, "O campo concluida deve ser um boleano.");
 
-  service.atualizar(obj).then(resultado => {
+  service.atualizar(parseInt(req.body.id), req.body.nome, req.body.concluida, usuario).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);
@@ -81,14 +75,16 @@ export function salvarQuestionarioRespondido(req: Request, res: Response) {
   });
 };
 
-export function atualizarQuestionarioRespondido(req: Request, res: Response) {
+export function atualizarQuestionarioRespondido(req: Request, res: Response) {//ooooooooooo
+  const token : string = req.headers['authorization'].toString().replace('Bearer ', '');
+  const usuario = jwt.verify(token, serverConf.jwt.secret)['data'] as Usuario;
+
   service.atualizarQuestionarioRespondido(new QuestionarioRespondido(
     parseInt(req.params.idEntrevista),
     req.body.idQuestionario,
     req.body.respostas,
     req.body.observacoes,
-    parseInt(req.params.id),
-  )).then(resultado => {
+    parseInt(req.params.id)), usuario).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);
@@ -154,6 +150,7 @@ export function listar(req: Request, res: Response) {
   service.listar(
     paginacao.pagina,
     paginacao.itensPorPagina,
+    req.query.filtroIdUsuario,
     req.query.filtroEvento,
     req.query.filtroUsuario,
     req.query.filtroNome,
