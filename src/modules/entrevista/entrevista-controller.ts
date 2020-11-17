@@ -150,6 +150,7 @@ export function listar(req: Request, res: Response) {
   service.listar(
     paginacao.pagina,
     paginacao.itensPorPagina,
+    req.query.filtroIdUsuario,
     req.query.filtroEvento,
     req.query.filtroUsuario,
     req.query.filtroNome,

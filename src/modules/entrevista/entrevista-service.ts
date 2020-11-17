@@ -192,12 +192,15 @@ export function atualizarQuestionarioRespondido(questionario: QuestionarioRespon
   });
 };
 
-export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroEvento?: string, filtroUsuario?: string, filtroNome?: string, filtroConcluidas?: boolean) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroIdUsuario?: number, filtroEvento?: string, filtroUsuario?: string, filtroNome?: string, filtroConcluidas?: boolean) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     const qtd = itensPorPagina || 15;
 
     let filtro = '';
+    if (!!filtroIdUsuario) {
+      filtro = filtro.concat(`AND u.id = ${filtroIdUsuario} `);
+    }
     if (!!filtroEvento) {
       filtro = filtro.concat(`AND ev.nome LIKE '%${filtroEvento}%' `);
     }
