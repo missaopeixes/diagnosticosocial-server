@@ -32,7 +32,7 @@ export function criar(pergunta: Pergunta) : Promise<ResultadoServico> {
           return db.perguntas.create(pergunta, {transaction: t})
           .then(resp => {
 
-            if (pergunta.tipoResposta == TipoResposta.MultiplaEscolha) {
+            if (pergunta.possuiOpcoes()) {
 
               let vinculos = pergunta.opcoesResposta.map((opcao, i) => new Object({
                 idPergunta: resp.id,
@@ -182,7 +182,7 @@ export function atualizar(pergunta: Pergunta) : Promise<ResultadoServico> {
             transaction: t
           }).then(resp => {
 
-            if (pergunta.tipoResposta == TipoResposta.MultiplaEscolha) {
+            if (pergunta.possuiOpcoes()) {
 
               return db.perguntasOpcoesResposta.destroy({
                 where: {
@@ -238,18 +238,18 @@ export function excluir(id: number) : Promise<ResultadoServico> {
 
         let queryBody = `FROM questionarioPerguntas qp LEFT JOIN questionariosRespondidos qr ON qr.idQuestionario = qp.idQuestionario
         WHERE qp.idPergunta = ${pergunta.id}
-        GROUP BY qp.idPergunta`
+        GROUP BY qp.idPergunta`;
 
         const queryRaw = `SELECT qr.idEntrevista, qp.idQuestionario, qp.idPergunta ${queryBody};`;
 
         db.sequelize.query(queryRaw, { model: db.questionarioPerguntas })
         .then((result) => {
           if (result.length > 0) {
-            if (result[0].dataValues.idEntrevista != null) {
-              return dbResolve(new ResultadoServico('Essa pergunta já foi utilizada em uma entrevista. Não é mais possível excluí-la.', StatusServico.Erro));
-            }
             if (result[0].dataValues.idQuestionario != null){
               return dbResolve(new ResultadoServico('Essa pergunta está vinculada a um questionário. Remova-a do questionário antes de excluí-la.', StatusServico.Erro));
+            }
+            if (result[0].dataValues.idEntrevista != null) {
+              return dbResolve(new ResultadoServico('Essa pergunta já foi utilizada em uma entrevista. Não é mais possível excluí-la.', StatusServico.Erro));
             }
           }
           else {

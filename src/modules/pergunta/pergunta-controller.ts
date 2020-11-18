@@ -9,7 +9,7 @@ export function criar(req: Request, res: Response) {
 
   service.criar(new Pergunta(
     req.body.descricao,
-    req.body.tipoResposta,
+    parseInt(req.body.tipoResposta),
     req.body.opcoesResposta
     )).then(resultado => {
 
