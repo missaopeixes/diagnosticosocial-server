@@ -32,7 +32,7 @@ export function criar(pergunta: Pergunta) : Promise<ResultadoServico> {
           return db.perguntas.create(pergunta, {transaction: t})
           .then(resp => {
 
-            if (pergunta.tipoResposta == TipoResposta.MultiplaEscolha) {
+            if (pergunta.possuiOpcoes()) {
 
               let vinculos = pergunta.opcoesResposta.map((opcao, i) => new Object({
                 idPergunta: resp.id,
@@ -175,36 +175,47 @@ export function atualizar(pergunta: Pergunta) : Promise<ResultadoServico> {
             return dbResolve(new ResultadoServico(erros, StatusServico.Erro));
           }
 
-          return db.perguntas.update(pergunta, {
+          db.respostas.findAll({
             where: {
-              id: pergunta.id
-            },
-            transaction: t
-          }).then(resp => {
-
-            if (pergunta.tipoResposta == TipoResposta.MultiplaEscolha) {
-
-              return db.perguntasOpcoesResposta.destroy({
-                where: {
-                  idPergunta: pergunta.id,
-                },
-                transaction: t
-              }).then(() => {
-
-                let vinculos = pergunta.opcoesResposta.map((opcao, i) => new Object({
-                  idPergunta: pergunta.id,
-                  idOpcaoResposta: opcao.id,
-                  ordem: i
-                }));
+              idPergunta: pergunta.id
+            }
+          }).then(resultado => {
     
-                return db.perguntasOpcoesResposta.bulkCreate(vinculos, {transaction: t}).then(() => {
-                  dbResolve(new ResultadoServico(resp));
+            if (resultado.length > 0 && p.tipoResposta !== pergunta.tipoResposta) {
+              return resolve(new ResultadoServico('Esta pergunta já foi respondida neste ou em outro questionário. Não é mais possível alterar seu tipo.', StatusServico.Erro));
+            }
+
+            return db.perguntas.update(pergunta, {
+              where: {
+                id: pergunta.id
+              },
+              transaction: t
+            }).then(resp => {
+  
+              if (pergunta.possuiOpcoes()) {
+  
+                return db.perguntasOpcoesResposta.destroy({
+                  where: {
+                    idPergunta: pergunta.id,
+                  },
+                  transaction: t
+                }).then(() => {
+  
+                  let vinculos = pergunta.opcoesResposta.map((opcao, i) => new Object({
+                    idPergunta: pergunta.id,
+                    idOpcaoResposta: opcao.id,
+                    ordem: i
+                  }));
+      
+                  return db.perguntasOpcoesResposta.bulkCreate(vinculos, {transaction: t}).then(() => {
+                    dbResolve(new ResultadoServico(resp));
+                  });
                 });
-              });
-            }
-            else {
-              dbResolve(new ResultadoServico(resp));
-            }
+              }
+              else {
+                dbResolve(new ResultadoServico(resp));
+              }
+            });
           });
         });
       })
@@ -238,18 +249,18 @@ export function excluir(id: number) : Promise<ResultadoServico> {
 
         let queryBody = `FROM questionarioPerguntas qp LEFT JOIN questionariosRespondidos qr ON qr.idQuestionario = qp.idQuestionario
         WHERE qp.idPergunta = ${pergunta.id}
-        GROUP BY qp.idPergunta`
+        GROUP BY qp.idPergunta`;
 
         const queryRaw = `SELECT qr.idEntrevista, qp.idQuestionario, qp.idPergunta ${queryBody};`;
 
         db.sequelize.query(queryRaw, { model: db.questionarioPerguntas })
         .then((result) => {
           if (result.length > 0) {
-            if (result[0].dataValues.idEntrevista != null) {
-              return dbResolve(new ResultadoServico('Essa pergunta já foi utilizada em uma entrevista. Não é mais possível excluí-la.', StatusServico.Erro));
-            }
             if (result[0].dataValues.idQuestionario != null){
               return dbResolve(new ResultadoServico('Essa pergunta está vinculada a um questionário. Remova-a do questionário antes de excluí-la.', StatusServico.Erro));
+            }
+            if (result[0].dataValues.idEntrevista != null) {
+              return dbResolve(new ResultadoServico('Essa pergunta já foi utilizada em uma entrevista. Não é mais possível excluí-la.', StatusServico.Erro));
             }
           }
           else {
@@ -353,19 +364,31 @@ export function desvincularResposta(idPergunta: number, idOpcaoResposta: number)
         return resolve(new ResultadoServico('Resposta não encontrada', StatusServico.Erro));
       }
 
-      db.perguntasOpcoesResposta.destroy({
+      db.respostas.findAll({
         where: {
-          idOpcaoResposta: opcaoResposta.id,
-          idPergunta: pergunta.id
+          idPergunta: pergunta.id,
+          idOpcaoEscolhida: opcaoResposta.id
         }
-      })
-      .then((resp) => {
-        resolve(new ResultadoServico(resp));
-      })
-      .catch(err => {
-        reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
-      });
+      }).then(resultado => {
 
+        if (resultado.length > 0) {
+          return resolve(new ResultadoServico('Esta opção de resposta já foi escolhida nesta ou em outra pergunta. Não é mais possível removê-la.', StatusServico.Erro));
+        }
+        
+        resolve(new ResultadoServico(true));
+        /*db.perguntasOpcoesResposta.destroy({
+          where: {
+            idOpcaoResposta: opcaoResposta.id,
+            idPergunta: pergunta.id
+          }
+        })
+        .then((resp) => {
+          resolve(new ResultadoServico(resp));
+        })
+        .catch(err => {
+          reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
+        });*/
+      })
     })
     .catch(err => {
       reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));

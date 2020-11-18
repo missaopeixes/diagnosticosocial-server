@@ -28,4 +28,14 @@ export class Pergunta extends BaseModel {
     this.tipoResposta = tipo;
     this.opcoesResposta = opcoes;
   }
+
+  possuiOpcoes() : boolean {
+    switch (this.tipoResposta) {
+      case TipoResposta.MultiplaEscolha:
+      case TipoResposta.MultiplaSelecao:
+        return true;
+      default:
+        return false;
+    }
+  }
 }
