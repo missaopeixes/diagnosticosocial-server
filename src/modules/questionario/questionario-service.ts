@@ -259,21 +259,34 @@ export function excluir(id: number) : Promise<ResultadoServico> {
           return dbResolve(new ResultadoServico('Questionário não encontrado', StatusServico.Erro));
         }
 
-        db.questionarioPerguntas.destroy({
+        return db.eventosQuestionarios.findAll({
           where: {
             idQuestionario: questionario.id
           },
           transaction: t
         })
-        .then(() => {
-          db.questionarios.destroy({
+        .then(resultado => {
+          
+          if (resultado.length > 0) {
+            return dbResolve(new ResultadoServico('Este questionário está vinculado á um evento. Remova-o do evento antes de excluí-lo.', StatusServico.Erro));
+          }
+
+          return db.questionarioPerguntas.destroy({
             where: {
-              id: questionario.id
+              idQuestionario: questionario.id
             },
             transaction: t
           })
-          .then(resp => {
-            dbResolve(new ResultadoServico(resp));
+          .then(() => {
+            return db.questionarios.destroy({
+              where: {
+                id: questionario.id
+              },
+              transaction: t
+            })
+            .then(resp => {
+              dbResolve(new ResultadoServico(resp));
+            });
           });
         });
       })
