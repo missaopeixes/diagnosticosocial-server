@@ -177,7 +177,7 @@ export function vincularResposta(req: Request, res: Response) {
   });
 }
 
-export function desvincularResposta(req: Request, res: Response) {
+export function validarDesvinculoResposta(req: Request, res: Response) {
 
   let id = parseInt(req.params.id);
   let idOpcaoResposta = parseInt(req.params.idOpcaoResposta);

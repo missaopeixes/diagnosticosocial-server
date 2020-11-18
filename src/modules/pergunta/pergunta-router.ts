@@ -15,5 +15,5 @@ export function aplicarRotas(base: string, server: Server) {
   server.post(`${base}/perguntas/:id/opcoes-resposta`, somenteAdm, controller.criarResposta);
 
   server.put(`${base}/perguntas/:id/opcoes-resposta/:idOpcaoResposta`, somenteAdm, controller.vincularResposta);
-  server.del(`${base}/perguntas/:id/opcoes-resposta/:idOpcaoResposta`, somenteAdm, controller.desvincularResposta);
+  server.get(`${base}/perguntas/:id/opcoes-resposta/:idOpcaoResposta/validacao-desvinculo`, somenteAdm, controller.validarDesvinculoResposta);
 }

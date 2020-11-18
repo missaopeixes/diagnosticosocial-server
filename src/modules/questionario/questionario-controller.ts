@@ -181,15 +181,15 @@ export function vincularPergunta(req: Request, res: Response) {
   });
 }
 
-export function desvincularPergunta(req: Request, res: Response) {
+export function validarDesvinculoPergunta(req: Request, res: Response) {
 
   let id = parseInt(req.params.id);
   let idPergunta = parseInt(req.params.idPergunta);
   
-  if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
-  if (!Number.isInteger(idPergunta)) return res.send(400, "idPergunta deve ser um número.");
+  if (!Number.isInteger(id)) return res.send(400, "O id deve ser um número.");
+  if (!Number.isInteger(idPergunta)) return res.send(400, "O idPergunta deve ser um número.");
 
-  service.desvincularPergunta(id, idPergunta).then(resultado => {
+  service.validarDesvinculoPergunta(id, idPergunta).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);

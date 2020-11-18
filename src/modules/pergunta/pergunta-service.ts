@@ -175,36 +175,47 @@ export function atualizar(pergunta: Pergunta) : Promise<ResultadoServico> {
             return dbResolve(new ResultadoServico(erros, StatusServico.Erro));
           }
 
-          return db.perguntas.update(pergunta, {
+          db.respostas.findAll({
             where: {
-              id: pergunta.id
-            },
-            transaction: t
-          }).then(resp => {
-
-            if (pergunta.possuiOpcoes()) {
-
-              return db.perguntasOpcoesResposta.destroy({
-                where: {
-                  idPergunta: pergunta.id,
-                },
-                transaction: t
-              }).then(() => {
-
-                let vinculos = pergunta.opcoesResposta.map((opcao, i) => new Object({
-                  idPergunta: pergunta.id,
-                  idOpcaoResposta: opcao.id,
-                  ordem: i
-                }));
+              idPergunta: pergunta.id
+            }
+          }).then(resultado => {
     
-                return db.perguntasOpcoesResposta.bulkCreate(vinculos, {transaction: t}).then(() => {
-                  dbResolve(new ResultadoServico(resp));
+            if (resultado.length > 0 && p.tipoResposta !== pergunta.tipoResposta) {
+              return resolve(new ResultadoServico('Esta pergunta já foi respondida neste ou em outro questionário. Não é mais possível alterar seu tipo.', StatusServico.Erro));
+            }
+
+            return db.perguntas.update(pergunta, {
+              where: {
+                id: pergunta.id
+              },
+              transaction: t
+            }).then(resp => {
+  
+              if (pergunta.possuiOpcoes()) {
+  
+                return db.perguntasOpcoesResposta.destroy({
+                  where: {
+                    idPergunta: pergunta.id,
+                  },
+                  transaction: t
+                }).then(() => {
+  
+                  let vinculos = pergunta.opcoesResposta.map((opcao, i) => new Object({
+                    idPergunta: pergunta.id,
+                    idOpcaoResposta: opcao.id,
+                    ordem: i
+                  }));
+      
+                  return db.perguntasOpcoesResposta.bulkCreate(vinculos, {transaction: t}).then(() => {
+                    dbResolve(new ResultadoServico(resp));
+                  });
                 });
-              });
-            }
-            else {
-              dbResolve(new ResultadoServico(resp));
-            }
+              }
+              else {
+                dbResolve(new ResultadoServico(resp));
+              }
+            });
           });
         });
       })
@@ -353,19 +364,31 @@ export function desvincularResposta(idPergunta: number, idOpcaoResposta: number)
         return resolve(new ResultadoServico('Resposta não encontrada', StatusServico.Erro));
       }
 
-      db.perguntasOpcoesResposta.destroy({
+      db.respostas.findAll({
         where: {
-          idOpcaoResposta: opcaoResposta.id,
-          idPergunta: pergunta.id
+          idPergunta: pergunta.id,
+          idOpcaoEscolhida: opcaoResposta.id
         }
-      })
-      .then((resp) => {
-        resolve(new ResultadoServico(resp));
-      })
-      .catch(err => {
-        reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
-      });
+      }).then(resultado => {
 
+        if (resultado.length > 0) {
+          return resolve(new ResultadoServico('Esta opção de resposta já foi escolhida nesta ou em outra pergunta. Não é mais possível removê-la.', StatusServico.Erro));
+        }
+        
+        resolve(new ResultadoServico(true));
+        /*db.perguntasOpcoesResposta.destroy({
+          where: {
+            idOpcaoResposta: opcaoResposta.id,
+            idPergunta: pergunta.id
+          }
+        })
+        .then((resp) => {
+          resolve(new ResultadoServico(resp));
+        })
+        .catch(err => {
+          reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
+        });*/
+      })
     })
     .catch(err => {
       reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
