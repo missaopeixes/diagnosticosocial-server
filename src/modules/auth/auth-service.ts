@@ -7,7 +7,7 @@ import { Usuario } from '../usuario/usuario-model';
 import { recuperarSenha } from '../usuario/usuario-service';
 import { Auth } from './auth-model';
 
-var nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 
 const serverConf = require('../../server.json');
 
@@ -66,10 +66,22 @@ export function solicitarNovaSenha(email: string) : Promise<ResultadoServico> {
 
       //email de confirmação
       var transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
         auth: {
+          type: 'OAuth2',
           user: 'dev.missaopeixes@gmail.com',
-          pass: 'mpdev455+'
+          accessToken: 'AIzaSyDoRzPJfqzIXk3XRqdQpU-lHbU9XNNfrLc'
+        }
+      });
+
+      transporter.set('oauth2_provision_cb', (user, renew, callback) => {
+        let accessToken = 'AIzaSyDoRzPJfqzIXk3XRqdQpU-lHbU9XNNfrLc';
+        if(!accessToken){
+            return callback(new Error('Unknown user'));
+        }else{
+            return callback(null, accessToken);
         }
       });
 
@@ -78,7 +90,7 @@ export function solicitarNovaSenha(email: string) : Promise<ResultadoServico> {
       var mailOptions = {
         from: 'dev.missaopeixes@gmail.com',
         to: email,
-        subject: 'Diagnóstico Social - Solicitação para Troca de Senha',
+        subject: 'Diagnóstico Social - Solicitação para troca de senha',
         html: `
             <div>
               <div style="
@@ -141,13 +153,13 @@ export function solicitarNovaSenha(email: string) : Promise<ResultadoServico> {
 
       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
-          reject(new ResultadoServico(error, StatusServico.Erro, TipoErro.Excecao));
-        } else {
-          console.log('Email sent: '+info.response);
+          console.error('erro: '+ error);
+          return reject(new ResultadoServico(error, StatusServico.Erro, TipoErro.Excecao));
         }
-      });
 
-      resolve(new ResultadoServico({mensagem: 'O email foi enviado com sucesso para '+email+'.'}));
+        console.log('Email sent: '+info.response);
+        resolve(new ResultadoServico({mensagem: 'O email foi enviado com sucesso para '+email+'.'}));
+      });
     })
     .catch(err => {
       reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
