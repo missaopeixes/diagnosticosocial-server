@@ -18,4 +18,6 @@ export function aplicarRotas(base: string, server: Server) {
   server.get(`${base}/eventos/:idEvento/relatorio`, controller.relatorio);
   server.get(`${base}/eventos/:idEvento/pergunta/:idPergunta/relatorio`, controller.relatorio);
   server.get(`${base}/eventos/:idEvento/pergunta/:idPergunta/respostas`, controller.respostas);
+
+  server.get(`${base}/eventos/:idEvento/cruzamento`, controller.cruzamento);
 }

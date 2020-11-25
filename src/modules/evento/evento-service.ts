@@ -1,6 +1,6 @@
 
 import db from '../../database/db-connection';
-import { Evento, QtdQuestionarioPorEnquete } from './evento-model';
+import { Cruzamento, Evento, QtdQuestionarioPorEnquete } from './evento-model';
 import { ResultadoServico, StatusServico, TipoErro } from '../../commom/resultado-servico';
 import { Op, Transaction } from 'sequelize';
 import * as crudUtils from '../../utils/crud-utils';
@@ -492,6 +492,42 @@ export function respostas(idEvento: number, idPergunta: number) : Promise<Result
 
     db.sequelize.query(query, {raw: true, type: Sequelize.QueryTypes.SELECT})
     .then(resp => {
+      resolve(new ResultadoServico(resp));
+    })
+    .catch(err => {
+      reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
+    });
+  });
+}
+
+export function cruzamento(idEvento: number, cruzamento: Cruzamento) : Promise<ResultadoServico> {
+  let query = `
+    SELECT
+    pUniverso.descricao as perguntaUniverso,
+    opUniverso.descricao as escolhaUniverso,
+    pAmostragem.descricao as perguntaAmostragem,
+    opAmostragem.descricao as escolhaAmostragem,
+    count(rAmostragem.id) as quantidade
+    FROM entrevistas eUniverso
+        LEFT JOIN questionariosRespondidos qrUniverso ON qrUniverso.idEntrevista = eUniverso.id
+        LEFT JOIN respostas rUniverso ON rUniverso.idQuestionarioRespondido = qrUniverso.id
+        LEFT JOIN perguntas pUniverso ON pUniverso.id = rUniverso.idPergunta
+        LEFT JOIN opcoesResposta opUniverso ON rUniverso.idOpcaoEscolhida = opUniverso.id
+        left join questionariosRespondidos qrAmostragem on qrAmostragem.idEntrevista = eUniverso.id
+        left join respostas rAmostragem on rAmostragem.idQuestionarioRespondido = qrAmostragem.id
+        left join perguntas pAmostragem on rAmostragem.idPergunta = pAmostragem.id
+        left join opcoesResposta opAmostragem on opAmostragem.id = rAmostragem.idOpcaoEscolhida
+    WHERE eUniverso.idEvento = ${idEvento} AND eUniverso.concluida = 1
+    AND qrUniverso.idQuestionario = ${cruzamento.idQrUniverso} AND rUniverso.idPergunta = ${cruzamento.idPerguntaUniverso} AND rUniverso.idOpcaoEscolhida = ${cruzamento.idOpEscolhidaUniverso}
+    and qrAmostragem.idQuestionario = ${cruzamento.idQrAmostragem} and rAmostragem.idPergunta = ${cruzamento.idPerguntaAmostragem}
+    group by rAmostragem.idOpcaoEscolhida ORDER by opAmostragem.id;
+  `;
+
+  return new Promise((resolve, reject) => {
+
+    db.sequelize.query(query, {raw: true, type: Sequelize.QueryTypes.SELECT})
+    .then(resp => {
+
       resolve(new ResultadoServico(resp));
     })
     .catch(err => {

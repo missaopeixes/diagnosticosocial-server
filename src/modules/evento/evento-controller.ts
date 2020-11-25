@@ -3,7 +3,7 @@ import { StatusServico } from '../../commom/resultado-servico';
 import { PaginacaoHttp } from '../../commom/paginacao-http';
 import { HttpUtils } from '../../utils/http-utils';
 import * as service from '../evento/evento-service';
-import { Evento } from '../evento/evento-model';
+import { Cruzamento, Evento } from '../evento/evento-model';
 import { Usuario } from '../usuario/usuario-model';
 import * as jwt from 'jsonwebtoken';
 
@@ -156,8 +156,41 @@ export function relatorio(req: Request, res: Response) {
 };
 
 export function respostas(req: Request, res: Response) {
-
+  
   service.respostas(req.params.idEvento, req.params.idPergunta).then(result => {
+
+    if (result.status === StatusServico.Erro) {
+      return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
+    }
+
+    res.send(200, result.conteudo);
+  })
+  .catch(err => {
+    res.send(500, err);
+  });
+};
+
+export function cruzamento(req: Request, res: Response) {
+
+  const idEvento = parseInt(req.params.idEvento);
+
+  if (!Number.isInteger(idEvento)) return res.send(400, "O idEvento deve ser um número.");
+
+  const cruzamento = new Cruzamento({
+    idPerguntaUniverso: parseInt(req.query.idPerguntaUniverso),
+    idPerguntaAmostragem: parseInt(req.query.idPerguntaAmostragem),
+    idQrUniverso: parseInt(req.query.idQrUniverso),
+    idQrAmostragem: parseInt(req.query.idQrAmostragem),
+    idOpEscolhidaUniverso: parseInt(req.query.idOpEscolhidaUniverso)
+  });
+
+  if (!Number.isInteger(cruzamento.idPerguntaUniverso)) return res.send(400, "O idPerguntaUniverso deve ser um número.");
+  if (!Number.isInteger(cruzamento.idPerguntaAmostragem)) return res.send(400, "O idPerguntaAmostragem deve ser um número.");
+  if (!Number.isInteger(cruzamento.idQrUniverso)) return res.send(400, "O idQrUniverso deve ser um número.");
+  if (!Number.isInteger(cruzamento.idQrAmostragem)) return res.send(400, "O idQrAmostragem deve ser um número.");
+  if (!Number.isInteger(cruzamento.idOpEscolhidaUniverso)) return res.send(400, "O idOpEscolhidaUniverso deve ser um número.");
+
+ service.cruzamento(idEvento, cruzamento).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
