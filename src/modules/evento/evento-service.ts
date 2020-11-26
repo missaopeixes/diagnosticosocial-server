@@ -416,7 +416,7 @@ export function relatorio(idEvento: number, idPergunta?: number) : Promise<Resul
     SELECT
       ev.nome AS evento,
 
-      (SELECT COUNT(e.id) FROM entrevistas e WHERE e.idEvento = ev.id) AS qtdEntrevistas,
+      (SELECT COUNT(e.id) FROM entrevistas e WHERE e.idEvento = ev.id AND e.concluida = 1) AS qtdEntrevistas,
 
       q.nome AS questionario,
       q.id AS idQuestionario,
@@ -428,7 +428,7 @@ export function relatorio(idEvento: number, idPergunta?: number) : Promise<Resul
 
       (SELECT COUNT(qr.id) FROM entrevistas e
         LEFT JOIN questionariosRespondidos qr ON qr.idEntrevista = e.id
-        WHERE e.idEvento = ev.id AND qr.idQuestionario = q.id) AS qtdQuestRespondidos,
+        WHERE e.idEvento = ev.id AND e.concluida = 1 AND qr.idQuestionario = q.id) AS qtdQuestRespondidos,
 
       p.descricao AS pergunta,
       p.id AS idPergunta,
@@ -440,13 +440,14 @@ export function relatorio(idEvento: number, idPergunta?: number) : Promise<Resul
       (SELECT COUNT(r.id) FROM entrevistas e
         LEFT JOIN questionariosRespondidos qr ON qr.idEntrevista = e.id
         LEFT JOIN respostas r ON r.idQuestionarioRespondido = qr.id
-        WHERE e.idEvento = ev.id AND qr.idQuestionario = q.id
-        AND r.idPergunta = p.id AND r.idOpcaoEscolhida = op.id) AS qtdEscolhas,
+        WHERE e.idEvento = ev.id AND e.concluida = 1
+        AND qr.idQuestionario = q.id AND r.idPergunta = p.id
+        AND r.idOpcaoEscolhida = op.id) AS qtdEscolhas,
 
       (SELECT AVG(r.respostaEmNumero) FROM entrevistas e
         LEFT JOIN questionariosRespondidos qr ON qr.idEntrevista = e.id
         LEFT JOIN respostas r ON r.idQuestionarioRespondido = qr.id
-        WHERE e.idEvento = ev.id
+        WHERE e.idEvento = ev.id AND e.concluida = 1
         AND qr.idQuestionario = q.id AND r.idPergunta = p.id) AS mediaRespNumero,
 
       evQ.ordem AS ordemQuestionario,
@@ -488,7 +489,7 @@ export function respostas(idEvento: number, idPergunta: number) : Promise<Result
     LEFT JOIN entrevistas e ON qr.idEntrevista = e.id
     LEFT JOIN usuarios u ON e.idUsuario = u.id
     LEFT JOIN opcoesResposta op ON r.idOpcaoEscolhida = op.id
-    WHERE e.idEvento = ${idEvento} AND r.idPergunta = ${idPergunta}`;
+    WHERE e.idEvento = ${idEvento} AND e.concluida = 1 AND r.idPergunta = ${idPergunta}`;
 
     db.sequelize.query(query, {raw: true, type: Sequelize.QueryTypes.SELECT})
     .then(resp => {
