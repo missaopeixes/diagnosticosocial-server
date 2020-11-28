@@ -503,10 +503,7 @@ export function respostas(idEvento: number, idPergunta: number) : Promise<Result
 export function cruzamento(idEvento: number, cruzamento: Cruzamento) : Promise<ResultadoServico> {
   let query = `
     SELECT
-    pUniverso.descricao as perguntaUniverso,
-    opUniverso.descricao as escolhaUniverso,
-    pAmostragem.descricao as perguntaAmostragem,
-    opAmostragem.descricao as escolhaAmostragem,
+    opAmostragem.id as idEscolhaAmostragem,
     count(rAmostragem.id) as quantidade
     FROM entrevistas eUniverso
         LEFT JOIN questionariosRespondidos qrUniverso ON qrUniverso.idEntrevista = eUniverso.id
