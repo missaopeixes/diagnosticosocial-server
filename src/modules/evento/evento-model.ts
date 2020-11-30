@@ -36,9 +36,9 @@ export class Cruzamento {
 
   idPerguntaUniverso: number = 1;
   idPerguntaAmostragem: number = 1;
-  idQrUniverso: number = 1;
-  idQrAmostragem: number = 1;
-  idOpEscolhidaUniverso: number = 1;
+  idQuestionarioUniverso: number = 1;
+  idQuestionarioAmostragem: number = 1;
+  idEscolhaUniverso: number = 1;
 
   constructor(cruzamento?: Partial<Cruzamento>) {
     Object.assign(this, cruzamento);

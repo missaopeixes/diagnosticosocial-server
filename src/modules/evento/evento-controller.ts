@@ -179,16 +179,16 @@ export function cruzamento(req: Request, res: Response) {
   const cruzamento = new Cruzamento({
     idPerguntaUniverso: parseInt(req.query.idPerguntaUniverso),
     idPerguntaAmostragem: parseInt(req.query.idPerguntaAmostragem),
-    idQrUniverso: parseInt(req.query.idQrUniverso),
-    idQrAmostragem: parseInt(req.query.idQrAmostragem),
-    idOpEscolhidaUniverso: parseInt(req.query.idOpEscolhidaUniverso)
+    idQuestionarioUniverso: parseInt(req.query.idQuestionarioUniverso),
+    idQuestionarioAmostragem: parseInt(req.query.idQuestionarioAmostragem),
+    idEscolhaUniverso: parseInt(req.query.idEscolhaUniverso)
   });
 
   if (!Number.isInteger(cruzamento.idPerguntaUniverso)) return res.send(400, "O idPerguntaUniverso deve ser um número.");
   if (!Number.isInteger(cruzamento.idPerguntaAmostragem)) return res.send(400, "O idPerguntaAmostragem deve ser um número.");
-  if (!Number.isInteger(cruzamento.idQrUniverso)) return res.send(400, "O idQrUniverso deve ser um número.");
-  if (!Number.isInteger(cruzamento.idQrAmostragem)) return res.send(400, "O idQrAmostragem deve ser um número.");
-  if (!Number.isInteger(cruzamento.idOpEscolhidaUniverso)) return res.send(400, "O idOpEscolhidaUniverso deve ser um número.");
+  if (!Number.isInteger(cruzamento.idQuestionarioUniverso)) return res.send(400, "O idQuestionarioUniverso deve ser um número.");
+  if (!Number.isInteger(cruzamento.idQuestionarioAmostragem)) return res.send(400, "O idQuestionarioAmostragem deve ser um número.");
+  if (!Number.isInteger(cruzamento.idEscolhaUniverso)) return res.send(400, "O idEscolhaUniverso deve ser um número.");
 
  service.cruzamento(idEvento, cruzamento).then(result => {
 

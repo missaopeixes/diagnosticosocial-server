@@ -515,8 +515,8 @@ export function cruzamento(idEvento: number, cruzamento: Cruzamento) : Promise<R
         left join perguntas pAmostragem on rAmostragem.idPergunta = pAmostragem.id
         left join opcoesResposta opAmostragem on opAmostragem.id = rAmostragem.idOpcaoEscolhida
     WHERE eUniverso.idEvento = ${idEvento} AND eUniverso.concluida = 1
-    AND qrUniverso.idQuestionario = ${cruzamento.idQrUniverso} AND rUniverso.idPergunta = ${cruzamento.idPerguntaUniverso} AND rUniverso.idOpcaoEscolhida = ${cruzamento.idOpEscolhidaUniverso}
-    and qrAmostragem.idQuestionario = ${cruzamento.idQrAmostragem} and rAmostragem.idPergunta = ${cruzamento.idPerguntaAmostragem}
+    AND qrUniverso.idQuestionario = ${cruzamento.idQuestionarioUniverso} AND rUniverso.idPergunta = ${cruzamento.idPerguntaUniverso} AND rUniverso.idOpcaoEscolhida = ${cruzamento.idEscolhaUniverso}
+    and qrAmostragem.idQuestionario = ${cruzamento.idQuestionarioAmostragem} and rAmostragem.idPergunta = ${cruzamento.idPerguntaAmostragem}
     group by rAmostragem.idOpcaoEscolhida ORDER by opAmostragem.id;
   `;
 
