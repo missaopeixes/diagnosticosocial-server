@@ -1,12 +1,19 @@
-
 import db from '../../database/db-connection';
 import { Entrevista } from './entrevista-model';
 import { ResultadoServico, StatusServico, TipoErro } from '../../commom/resultado-servico';
 import * as crudUtils from '../../utils/crud-utils';
 import { Transaction } from 'sequelize';
 import { QuestionarioRespondido } from '../questionario/questionario-model';
-import questionariosRespondidos from '../../database/context/questionariosRespondidos';
 import { Usuario } from '../usuario/usuario-model';
+
+interface FiltroEntrevista {
+  idUsuario?: number,
+  evento?: string,
+  usuario?: string,
+  nome?: string,
+  concluidas?: boolean,
+  emAndamento?: boolean
+}
 
 export function criar(entrevista: Entrevista) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
@@ -192,30 +199,50 @@ export function atualizarQuestionarioRespondido(questionario: QuestionarioRespon
   });
 };
 
-export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroIdUsuario?: number, filtroEvento?: string, filtroUsuario?: string, filtroNome?: string, filtroConcluidas?: boolean) : Promise<ResultadoServico> {
+
+
+export function listar(pagina: number = 1, itensPorPagina: number = 15, filtro: FiltroEntrevista) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     const qtd = itensPorPagina || 15;
 
-    let filtro = '';
-    if (!!filtroIdUsuario) {
-      filtro = filtro.concat(`AND u.id = ${filtroIdUsuario} `);
+    let filtroQuery = 'WHERE ';
+    if (filtro.concluidas && filtro.emAndamento) {
+      //Sem filtro para conclusão de entrevistas
     }
-    if (!!filtroEvento) {
-      filtro = filtro.concat(`AND ev.nome LIKE '%${filtroEvento}%' `);
+    if (filtro.concluidas && !filtro.emAndamento) {
+      filtroQuery = filtroQuery.concat(`e.concluida = true `);
     }
-    if (!!filtroUsuario) {
-      filtro = filtro.concat(`AND u.nome LIKE '%${filtroUsuario}%' `);
+    if (!filtro.concluidas && filtro.emAndamento) {
+      filtroQuery = filtroQuery.concat(`e.concluida = false `);
     }
-    if (!!filtroNome) {
-      filtro = filtro.concat(`AND e.nome LIKE '%${filtroNome}%' `);
+
+    if (!!filtro.idUsuario) {
+      filtroQuery = filtroQuery != 'WHERE ' ?
+        filtroQuery.concat(`AND u.id = ${filtro.idUsuario} `) :
+        filtroQuery.concat(`u.id = ${filtro.idUsuario} `);
+    }
+    if (!!filtro.evento) {
+      filtroQuery = filtroQuery != 'WHERE ' ?
+        filtroQuery.concat(`AND ev.nome LIKE '%${filtro.evento}%' `) :
+        filtroQuery.concat(`ev.nome LIKE '%${filtro.evento}%' `);
+    }
+    if (!!filtro.usuario) {
+      filtroQuery = filtroQuery != 'WHERE ' ?
+        filtroQuery.concat(`AND u.nome LIKE '%${filtro.usuario}%' `) :
+        filtroQuery.concat(`u.nome LIKE '%${filtro.usuario}%' `);
+    }
+    if (!!filtro.nome) {
+      filtroQuery = filtroQuery != 'WHERE ' ?
+        filtroQuery.concat(`AND e.nome LIKE '%${filtro.nome}%' `) :
+        filtroQuery.concat(`e.nome LIKE '%${filtro.nome}%' `);
     }
 
     const queryBody = `FROM entrevistas e
       LEFT JOIN eventos ev ON ev.id = e.idEvento
       LEFT JOIN usuarios u ON u.id = e.idUsuario
-      WHERE e.concluida = ${!!filtroConcluidas} ${filtro}
-      ORDER BY e.createdAt DESC`;
+      ${filtroQuery == 'WHERE ' ? '' : filtroQuery}
+      ORDER BY e.concluida, e.createdAt DESC`;
     const queryRaw = `SELECT e.*, ev.nome AS evento, u.nome AS usuario ${queryBody} LIMIT ${(pagina - 1) * qtd}, ${qtd};`;
     const queryCount = `SELECT COUNT(e.id) as total ${queryBody}`;
 

@@ -147,15 +147,41 @@ export function listar(req: Request, res: Response) {
     return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
   }
 
+  let concluidas: string;
+  let emAndamento: string;
+  switch (req.query.filtroStatus) {
+    case '1':
+      concluidas = 'true';
+      emAndamento = 'false';
+      break;
+      
+    case '2':
+      concluidas = 'false';
+      emAndamento = 'true';
+      break;
+        
+    case '3':
+      concluidas = 'true';
+      emAndamento = 'true';
+      break;
+
+    default:
+      concluidas = 'true';
+      emAndamento = 'true';
+      break;
+  }
+
   service.listar(
     paginacao.pagina,
     paginacao.itensPorPagina,
-    req.query.filtroIdUsuario,
-    req.query.filtroEvento,
-    req.query.filtroUsuario,
-    req.query.filtroNome,
-    req.query.filtroConcluidas === 'true',
-  ).then(result => {
+    {
+      idUsuario: req.query.filtroIdUsuario,
+      evento: req.query.filtroEvento,
+      usuario: req.query.filtroUsuario,
+      nome: req.query.filtroNome,
+      concluidas: concluidas === 'true',
+      emAndamento: emAndamento === 'true'
+    }).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
