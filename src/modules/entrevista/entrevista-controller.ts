@@ -20,6 +20,7 @@ export function criar(req: Request, res: Response) {
     req.body.nome,
     req.body.respostas,
     req.body.observacoes,
+    req.body.concluida
   )).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
