@@ -8,6 +8,7 @@ import { recuperarSenha } from '../usuario/usuario-service';
 import { Auth } from './auth-model';
 
 const nodemailer = require('nodemailer');
+const xoauth2 = require('xoauth2');
 
 const serverConf = require('../../server.json');
 
@@ -64,29 +65,48 @@ export function solicitarNovaSenha(email: string) : Promise<ResultadoServico> {
         return resolve(new ResultadoServico('Credenciais inválidas.', StatusServico.Erro, TipoErro.Autenticacao));
       }
 
+      const USER_NAME = 'Desenvolvimento Missão Peixes';
+      const CLIENT_ID = '74159257235-57ckupj1hojj98odhl4cs16iabf685ds.apps.googleusercontent.com';
+      const CLIENT_SECRET = 'Cv3sjWrAY7chIduqRELtyhFf';
+      const REFRESH_TOKEN = '1//04VOyZkNN7ku6CgYIARAAGAQSNwF-L9IrRfPvyeJO9LSQhIP5iUBQwUzMbprqmrtcvFJfyOPJ5PuBqmiDqshO0BwZAOdTfZ4skVk';
+      const ACCESS_TOKEN = 'ya29.a0AfH6SMBqu-jRdkuVAa2n7gWDJXedgRgW9Mh6iRViaQ17qdIXxYoLTu3U_YdCJmWiUk-V0nEBt9AWAHz8OXcRl2mXByIscqg7HudRjEZcng3DChoeyHw21EM5RqkAJ46utQEmKaC9E2GvxoiBAhujkA6uDTSp4wFZpkpfVVWtTUs';
+
       //email de confirmação
-      var transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
+      /*let transporter = nodemailer.createTransport({
+        service: 'Gmail',
         auth: {
-          type: 'OAuth2',
           user: 'dev.missaopeixes@gmail.com',
-          accessToken: 'AIzaSyDoRzPJfqzIXk3XRqdQpU-lHbU9XNNfrLc'
+          pass: 'mpdev455+',
+          type: 'OAuth2',
+          clientId: CLIENT_ID,
+          clientSecret: CLIENT_SECRET
+        }
+      });*/
+
+      let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'dev.missaopeixes@gmail.com',
+          pass: 'mpdev455+',
+          xoauth2: xoauth2.createXOAuth2Generator({
+            user: USER_NAME,
+            clientId: CLIENT_ID,
+            clientSecret: CLIENT_SECRET,
+            refreshToken: REFRESH_TOKEN,
+            accessToken: ACCESS_TOKEN
+          })
         }
       });
 
-      transporter.set('oauth2_provision_cb', (user, renew, callback) => {
-        let accessToken = 'AIzaSyDoRzPJfqzIXk3XRqdQpU-lHbU9XNNfrLc';
-        if(!accessToken){
-            return callback(new Error('Unknown user'));
-        }else{
-            return callback(null, accessToken);
-        }
+      transporter.on('token', token => {
+        console.log('A new access token was generated');
+        console.log('User: %s', token.user);
+        console.log('Access Token: %s', token.accessToken);
+        console.log('Expires: %s', new Date(token.expires));
       });
 
       const tokenLink = jwt.sign({data: resp}, serverConf.jwtNewPass.secret, {expiresIn: serverConf.jwtNewPass.expiresIn});
-      
+
       var mailOptions = {
         from: 'dev.missaopeixes@gmail.com',
         to: email,
@@ -106,7 +126,7 @@ export function solicitarNovaSenha(email: string) : Promise<ResultadoServico> {
                   font-size: 20px;
                   line-height: 68px;
                 ">
-                <img src="http://missaoapps.com.br/assets/logo.png" style="
+                <img src="http://diagnostico.missaopeixes.org/assets/logo.png" style="
                   width: 88px;
                   margin: 0.4rem;
                   float: left;
@@ -132,7 +152,7 @@ export function solicitarNovaSenha(email: string) : Promise<ResultadoServico> {
                   Se você não reconhece esta atividade, por favor ignore este email. Caso queira alterar a senha de sua 
                   conta, acesse o link abaixo:
                 </p><br>
-                <a href="http://missaoapps.com.br/recuperacao/validacao?token=${tokenLink}" style="
+                <a href="http://diagnostico.missaopeixes.org/recuperacao/validacao?token=${tokenLink}" style="
                   background-color: #289c93;
                   border-radius: 8px;
                   text-decoration: none;
@@ -143,12 +163,19 @@ export function solicitarNovaSenha(email: string) : Promise<ResultadoServico> {
                 ">Alterar Senha</a><br><br><br>
                 <b style="color: #333;">Este link permanecerá funcionando por 1 hora a partir de sua emissão!</b><br>
                 <p style="color: #333;">Caso o botão não funcione, utilize a URL a seguir:</p>
-                <i style="color: #289c93;">http://missaoapps.com.br/recuperacao/validacao?token=${tokenLink}</i><br><br><hr>
-                <img src="http://missaoapps.com.br/assets/logo-missao.png" width="200" style="
+                <i style="color: #289c93;">http://diagnostico.missaopeixes.org/recuperacao/validacao?token=${tokenLink}</i><br><br><hr>
+                <img src="http://diagnostico.missaopeixes.org/assets/logo-missao.png" width="200" style="
                   margin-to: 1rem;
                 "/>
               </div>
             </div>`
+
+        /*auth : {
+          user: USER_NAME,
+          refreshToken: REFRESH_TOKEN,
+          accessToken: ACCESS_TOKEN,
+          expires: 1494388182480
+        }*/
       };
 
       transporter.sendMail(mailOptions, function(error, info){
