@@ -7,6 +7,16 @@ import { Usuario } from '../usuario/usuario-model';
 import { recuperarSenha } from '../usuario/usuario-service';
 import { Auth } from './auth-model';
 
+import {
+  USER_EMAIL,
+  USER_PASS,
+  USER_NAME,
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REFRESH_TOKEN,
+  ACCESS_TOKEN
+} from '../../enviroment';
+
 const nodemailer = require('nodemailer');
 const xoauth2 = require('xoauth2');
 
@@ -65,12 +75,6 @@ export function solicitarNovaSenha(email: string) : Promise<ResultadoServico> {
         return resolve(new ResultadoServico('Credenciais inválidas.', StatusServico.Erro, TipoErro.Autenticacao));
       }
 
-      const USER_NAME = 'Desenvolvimento Missão Peixes';
-      const CLIENT_ID = '74159257235-57ckupj1hojj98odhl4cs16iabf685ds.apps.googleusercontent.com';
-      const CLIENT_SECRET = 'Cv3sjWrAY7chIduqRELtyhFf';
-      const REFRESH_TOKEN = '1//04VOyZkNN7ku6CgYIARAAGAQSNwF-L9IrRfPvyeJO9LSQhIP5iUBQwUzMbprqmrtcvFJfyOPJ5PuBqmiDqshO0BwZAOdTfZ4skVk';
-      const ACCESS_TOKEN = 'ya29.a0AfH6SMBqu-jRdkuVAa2n7gWDJXedgRgW9Mh6iRViaQ17qdIXxYoLTu3U_YdCJmWiUk-V0nEBt9AWAHz8OXcRl2mXByIscqg7HudRjEZcng3DChoeyHw21EM5RqkAJ46utQEmKaC9E2GvxoiBAhujkA6uDTSp4wFZpkpfVVWtTUs';
-
       //email de confirmação
       /*let transporter = nodemailer.createTransport({
         service: 'Gmail',
@@ -84,10 +88,10 @@ export function solicitarNovaSenha(email: string) : Promise<ResultadoServico> {
       });*/
 
       let transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: 'Gmail',
         auth: {
-          user: 'dev.missaopeixes@gmail.com',
-          pass: 'mpdev455+',
+          user: USER_EMAIL,
+          pass: USER_PASS,
           xoauth2: xoauth2.createXOAuth2Generator({
             user: USER_NAME,
             clientId: CLIENT_ID,
