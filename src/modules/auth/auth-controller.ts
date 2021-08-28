@@ -25,6 +25,31 @@ export function signin(req: Request, res: Response) {
   });
 };
 
+export function cadastrar(req: Request, res: Response) {
+
+  let nomeOrganizacao = req.body.nomeOrganizacao;
+  //let logo = req.body.logo;
+  //let cnpj = req.body.cnpj;
+  let nome = req.body.nome;
+  let login = req.body.login;
+  let email = req.body.email;
+  let senha = req.body.senha;
+  let administrador = true;
+
+  
+  service.cadastrar(nomeOrganizacao, nome, login, email, senha, administrador).then(resultado => {
+
+    if (resultado.status === StatusServico.Erro) {
+      return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);
+    }
+
+    res.send(200, resultado.conteudo);
+  })
+  .catch(err => {
+    res.send(500, err);
+  });
+};
+
 export function solicitarNovaSenha(req: Request, res: Response) {
   
   if (!req.body || !req.body.email || typeof req.body.email != "string") return res.send(400, "email deve ser um texto.");

@@ -5,6 +5,7 @@ import * as entrevista from './modules/entrevista/entrevista-router';
 import * as pergunta from './modules/pergunta/pergunta-router';
 import * as opcaoResposta from './modules/opcaoResposta/opcaoResposta-router';
 import * as usuario from './modules/usuario/usuario-router';
+import * as organizacao from './modules/organizacao/organizacao-router';
 import * as evento from './modules/evento/evento-router';
 import * as auth from './modules/auth/auth-router';
 import * as serveStatic from 'serve-static-restify';
@@ -43,6 +44,7 @@ entrevista.aplicarRotas(BASE_API_URL, server);
 pergunta.aplicarRotas(BASE_API_URL, server);
 opcaoResposta.aplicarRotas(BASE_API_URL, server);
 usuario.aplicarRotas(BASE_API_URL, server);
+organizacao.aplicarRotas(BASE_API_URL, server);
 evento.aplicarRotas(BASE_API_URL, server);
 auth.aplicarRotas(BASE_API_URL, server);
 

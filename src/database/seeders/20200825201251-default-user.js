@@ -4,6 +4,13 @@ module.exports = {
   up: async (queryInterface, _Sequelize) => {
 
     var now = new Date().toJSON().split('.')[0].replace('T', ' ');
+    
+    /**
+     * Incluindo organização padrão.
+    */
+    await queryInterface.bulkInsert('organizacoes', [{
+      nome: 'Missão Peixes'
+    }], {});
 
     /**
      * Incluindo usuário administrador padrão.
@@ -15,7 +22,8 @@ module.exports = {
       email: 'dev.missaopeixes@gmail.com',
       senha: '$2b$10$llBT2.2gv9IhpDiLhUzrJu6E.4hHHC6dxwurtguyqIv5bJDtrLf1u', // 1234
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      idOrganizacao: 1
     }], {});
   },
 

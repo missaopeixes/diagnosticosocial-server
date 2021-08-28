@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 
 const PASSWORD_SALT_ROUNDS = 10;
 
-export function criar(nome: string, login: string, email: string, senha: string, administrador: boolean) : Promise<ResultadoServico> {
+export function criar(nome: string, login: string, email: string, senha: string, administrador: boolean, idOrganizacao: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
     
     const usuario = new Usuario();
@@ -15,6 +15,7 @@ export function criar(nome: string, login: string, email: string, senha: string,
     usuario.email = email;
     usuario.senha = senha;
     usuario.administrador = administrador;
+    usuario.idOrganizacao = idOrganizacao;
 
     usuario.validar().then(erros => {
 

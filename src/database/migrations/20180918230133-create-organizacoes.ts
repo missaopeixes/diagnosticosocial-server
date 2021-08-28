@@ -5,7 +5,7 @@ import {
 
 export = {
     up: (queryInterface: QueryInterface, Sequelize: SequelizeStatic) => {
-        return queryInterface.createTable('usuarios', {
+        return queryInterface.createTable('organizacoes', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
@@ -15,23 +15,6 @@ export = {
 
             nome: {
                 type: Sequelize.STRING(100)
-            },
-
-            login: {
-                type: Sequelize.STRING(100)
-            },
-
-            senha: {
-                type: Sequelize.STRING
-            },
-            
-            idOrganizacao: {
-                type: Sequelize.INTEGER,
-                references: {
-                    model: 'organizacoes',
-                    key: 'id',
-                },
-                allowNull: false
             },
 
             createdAt: {
@@ -47,6 +30,6 @@ export = {
     },
 
     down: (queryInterface: QueryInterface, Sequelize: SequelizeStatic) => {
-        return queryInterface.dropTable('usuarios');
+        return queryInterface.dropTable('organizacoes');
     }
 };

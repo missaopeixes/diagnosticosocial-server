@@ -1,9 +1,11 @@
 import db from '../../database/db-connection';
 import { ResultadoServico, StatusServico, TipoErro } from '../../commom/resultado-servico';
+import { Transaction } from 'sequelize';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 
 import { Usuario } from '../usuario/usuario-model';
+import { Organizacao } from '../organizacao/organizacao-model';
 import { recuperarSenha } from '../usuario/usuario-service';
 import { Auth } from './auth-model';
 
@@ -21,6 +23,8 @@ const nodemailer = require('nodemailer');
 const xoauth2 = require('xoauth2');
 
 const serverConf = require('../../server.json');
+
+const PASSWORD_SALT_ROUNDS = 10;
 
 export function signin(login: string, senha: string) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
@@ -50,6 +54,7 @@ export function signin(login: string, senha: string) : Promise<ResultadoServico>
           id: resp.id,
           nome: resp.nome,
           administrador: resp.administrador,
+          idOrganizacao: resp.idOrganizacao,
           validade: serverConf.jwt.expiresIn,
           token
         })));
@@ -58,6 +63,85 @@ export function signin(login: string, senha: string) : Promise<ResultadoServico>
     .catch(err => {
       reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
     });
+  });
+};
+
+export function cadastrar(nomeOrganizacao: string, nome: string, login: string, email: string, senha: string, administrador: boolean) : Promise<ResultadoServico> {
+  return new Promise((resolve, reject) => {
+
+    const organizacao = new Organizacao();
+    organizacao.nome = nomeOrganizacao;
+
+    organizacao.validar().then(erros => {
+
+      if (erros.length > 0) {
+        return resolve(new ResultadoServico(erros, StatusServico.Erro));
+      }
+
+      db.sequelize.transaction((t: Transaction) => new Promise<ResultadoServico>((dbResolve, dbReject) => {
+        
+        db.organizacoes.find({where: {nome: organizacao.nome}}).then((lista) => {
+          if (!!lista) return dbResolve(new ResultadoServico('Este nome já está sendo utilizado para a Organização!', StatusServico.Erro));
+  
+          db.organizacoes.create(organizacao, {transaction: t}).then(resp => {
+
+            const usuario = new Usuario();
+            usuario.nome = nome;
+            usuario.login = login;
+            usuario.email = email;
+            usuario.senha = senha;
+            usuario.administrador = administrador;
+            usuario.idOrganizacao = resp.id;
+
+            usuario.validar().then(erros => {
+
+              console.log('erros', erros);
+              if (erros.length > 0) {
+                t.rollback();
+                return resolve(new ResultadoServico(erros, StatusServico.Erro));
+              }
+
+              db.usuarios.find({where: {idOrganizacao: usuario.idOrganizacao}}).then((lista) => {
+                if (!!lista) {t.rollback(); return resolve(new ResultadoServico('Esta organização já está sendo utilizada!', StatusServico.Erro));}
+
+                db.usuarios.find({where: {login: usuario.login}}).then((lista) => {
+                  if (!!lista) {t.rollback(); return resolve(new ResultadoServico('Este login já está sendo utilizado!', StatusServico.Erro));}
+          
+                  return db.usuarios.find({where: {email: usuario.email}}).then((lista) => {
+                    if (!!lista) {t.rollback(); return resolve(new ResultadoServico('Este e-mail já está sendo utilizado por outro usuário.', StatusServico.Erro));}
+          
+                    bcrypt.hash(usuario.senha, PASSWORD_SALT_ROUNDS, (err, hash) => {
+          
+                      if (err) {
+                        t.rollback();
+                        return resolve(new ResultadoServico(erros, StatusServico.Erro, TipoErro.Excecao));
+                      }
+          
+                      usuario.senha = hash;
+          
+                      db.usuarios.create(usuario).then(resp => {
+                        if (!resp) {t.rollback(); return resolve(new ResultadoServico('Ocorreu um erro ao cadastrar o Usuário.', StatusServico.Erro));}
+
+                        return resolve(new ResultadoServico('Cadastro realizado com sucesso!'));
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          })
+          .catch(err => {
+            t.rollback();
+            dbReject(new ResultadoServico('Erro ao cadastrar a Organização!', StatusServico.Erro, TipoErro.Excecao));
+          });
+        });
+      }))
+      .then((resultado) => {console.log(resultado); resolve(resultado)})
+      .catch(err => {
+        reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
+      });
+    })
+    .catch(err => reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao)));
   });
 };
 

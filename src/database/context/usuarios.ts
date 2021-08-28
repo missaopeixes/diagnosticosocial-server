@@ -10,19 +10,21 @@ export interface UsuariosAttributes {
     email : string;
     senha : string;
     administrador : boolean;
-
+    idOrganizacao : number;
+    
 }
 
 export interface UsuariosInstance {
     id: number;
     createdAt: Date;
     updatedAt: Date;
-
+    
     nome: string;
     login: string;
     email: string;
     senha: string;
     administrador : boolean;
+    idOrganizacao : number;
 }
 
 export default (sequelize: Sequelize, DataTypes: DataTypes) => {
@@ -31,7 +33,8 @@ export default (sequelize: Sequelize, DataTypes: DataTypes) => {
         login: DataTypes.STRING(100),
         email: DataTypes.STRING(100),
         senha: DataTypes.STRING,
-        administrador: DataTypes.BOOLEAN
+        administrador: DataTypes.BOOLEAN,
+        idOrganizacao: DataTypes.INTEGER
     });
 
     usuarios.associate = function(models) {

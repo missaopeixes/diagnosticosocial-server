@@ -22,6 +22,8 @@ export class Usuario extends BaseModel {
 
   @IsBoolean({message: 'O campo administrador deve conter um boleano.'})
   administrador: boolean;
+  
+  idOrganizacao: number;
 
   constructor(){
     super();

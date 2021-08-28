@@ -5,6 +5,7 @@ export class Auth {
   login: string = '';
   nome: string = '';
   administrador: boolean = false;
+  idOrganizacao: number = 0;
   validade: string = '1d';
   token: string = '';
 

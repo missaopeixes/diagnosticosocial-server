@@ -15,8 +15,9 @@ export function criar(req: Request, res: Response) {
   let email = req.body.email;
   let senha = req.body.senha;
   let administrador = req.body.administrador;
+  let idOrganizacao = req.body.idOrganizacao;
   
-  service.criar(nome, login, email, senha, administrador).then(resultado => {
+  service.criar(nome, login, email, senha, administrador, idOrganizacao).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);

@@ -12,6 +12,7 @@ import { OpcoesRespostaInstance, OpcoesRespostaAttributes } from './context/opco
 import { QuestionarioPerguntasInstance, QuestionarioPerguntasAttributes } from './context/questionarioPerguntas';
 import { PerguntasOpcoesRespostaInstance, PerguntasOpcoesRespostaAttributes } from './context/perguntasOpcoesResposta';
 import { UsuariosInstance, UsuariosAttributes } from './context/usuarios';
+import { OrganizacoesInstance, OrganizacoesAttributes } from './context/organizacoes';
 import { EventosInstance, EventosAttributes } from './context/eventos';
 import { EventosQuestionariosInstance, EventosQuestionariosAttributes } from './context/eventosQuestionarios';
 import questionariosRespondidos, { QuestionariosRespondidosInstance, QuestionariosRespondidosAttributes } from './context/questionariosRespondidos';
@@ -28,6 +29,7 @@ interface DbConnection {
   eventos: Sequelize.Model<EventosInstance, EventosAttributes>
   eventosQuestionarios: Sequelize.Model<EventosQuestionariosInstance, EventosQuestionariosAttributes>
   usuarios: Sequelize.Model<UsuariosInstance, UsuariosAttributes>
+  organizacoes: Sequelize.Model<OrganizacoesInstance, OrganizacoesAttributes>
   sequelize: Sequelize.Sequelize
 };
 
