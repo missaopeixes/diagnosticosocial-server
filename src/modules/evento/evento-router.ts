@@ -1,21 +1,21 @@
 import {Server} from 'restify';
-import { somenteAdm } from '../../utils/permission-utils';
+import { somenteAdm, verificaOrg } from '../../utils/permission-utils';
 import * as controller from '../evento/evento-controller';
 
 export function aplicarRotas(base: string, server: Server) {
 
-  server.post(`${base}/eventos`, somenteAdm, controller.criar);
+  server.post(`${base}/eventos`, verificaOrg, somenteAdm, controller.criar);
 
-  server.get(`${base}/eventos`, controller.listar);
-  server.get(`${base}/eventos/:id`, controller.obter);
-  server.get(`${base}/eventos/todos`, controller.obterTodos);
-  server.get(`${base}/eventos/:id/questionarios`, controller.obterQuestionarios);
-  server.put(`${base}/eventos/:id`, somenteAdm, controller.atualizar);
-  server.del(`${base}/eventos/:id`, somenteAdm, controller.excluir);
+  server.get(`${base}/eventos`, verificaOrg, controller.listar);
+  server.get(`${base}/eventos/:id`, verificaOrg, controller.obter);
+  server.get(`${base}/eventos/todos`, verificaOrg, controller.obterTodos);
+  server.get(`${base}/eventos/:id/questionarios`, verificaOrg, controller.obterQuestionarios);
+  server.put(`${base}/eventos/:id`, verificaOrg, somenteAdm, controller.atualizar);
+  server.del(`${base}/eventos/:id`, verificaOrg, somenteAdm, controller.excluir);
 
-  server.post(`${base}/eventos/:id/preencher-mock`, somenteAdm, controller.preencherMock);
+  server.post(`${base}/eventos/:id/preencher-mock`, verificaOrg, somenteAdm, controller.preencherMock);
 
-  server.get(`${base}/eventos/:idEvento/relatorio`, controller.relatorio);
-  server.get(`${base}/eventos/:idEvento/pergunta/:idPergunta/relatorio`, controller.relatorio);
-  server.get(`${base}/eventos/:idEvento/pergunta/:idPergunta/respostas`, controller.respostas);
+  server.get(`${base}/eventos/:idEvento/relatorio`, verificaOrg, controller.relatorio);
+  server.get(`${base}/eventos/:idEvento/pergunta/:idPergunta/relatorio`, verificaOrg, controller.relatorio);
+  server.get(`${base}/eventos/:idEvento/pergunta/:idPergunta/respostas`, verificaOrg, controller.respostas);
 }

@@ -1,19 +1,19 @@
 import {Server} from 'restify';
-import { somenteAdm } from '../../utils/permission-utils';
+import { somenteAdm, verificaOrg } from '../../utils/permission-utils';
 import * as controller from './pergunta-controller';
 
 export function aplicarRotas(base: string, server: Server) {
 
-  server.post(`${base}/perguntas`, somenteAdm, controller.criar);
+  server.post(`${base}/perguntas`, verificaOrg, somenteAdm, controller.criar);
 
-  server.get(`${base}/perguntas`, controller.listar);
-  server.get(`${base}/perguntas/pesquisa`, controller.pesquisar);
-  server.get(`${base}/perguntas/:id`, controller.obter);
-  server.put(`${base}/perguntas/:id`, somenteAdm, controller.atualizar);
-  server.del(`${base}/perguntas/:id`, somenteAdm, controller.excluir);
+  server.get(`${base}/perguntas`, verificaOrg, controller.listar);
+  server.get(`${base}/perguntas/pesquisa`, verificaOrg, controller.pesquisar);
+  server.get(`${base}/perguntas/:id`, verificaOrg, controller.obter);
+  server.put(`${base}/perguntas/:id`, verificaOrg, somenteAdm, controller.atualizar);
+  server.del(`${base}/perguntas/:id`, verificaOrg, somenteAdm, controller.excluir);
 
-  server.post(`${base}/perguntas/:id/opcoes-resposta`, somenteAdm, controller.criarResposta);
+  server.post(`${base}/perguntas/:id/opcoes-resposta`, verificaOrg, somenteAdm, controller.criarResposta);
 
-  server.put(`${base}/perguntas/:id/opcoes-resposta/:idOpcaoResposta`, somenteAdm, controller.vincularResposta);
-  server.get(`${base}/perguntas/:id/opcoes-resposta/:idOpcaoResposta/validacao-desvinculo`, somenteAdm, controller.validarDesvinculoResposta);
+  server.put(`${base}/perguntas/:id/opcoes-resposta/:idOpcaoResposta`, verificaOrg, somenteAdm, controller.vincularResposta);
+  server.get(`${base}/perguntas/:id/opcoes-resposta/:idOpcaoResposta/validacao-desvinculo`, verificaOrg, somenteAdm, controller.validarDesvinculoResposta);
 }
