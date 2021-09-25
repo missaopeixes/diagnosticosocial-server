@@ -1,5 +1,5 @@
 
-import { MaxLength, IsDefined, IsNumber } from 'class-validator';
+import { MaxLength, IsDefined, IsInt } from 'class-validator';
 import { BaseModel } from '../../commom/base-model';
 import { TipoResposta } from '../../commom/tipo-resposta';
 import { OpcaoResposta } from '../opcaoResposta/opcaoResposta-model';
@@ -21,12 +21,16 @@ export class Pergunta extends BaseModel {
   tipoResposta: TipoResposta;
 
   opcoesResposta: OpcaoResposta[];
+  
+  @IsInt({message: 'O campo idOrganizacao deve conter um número inteiro.'})
+  idOrganizacao: number;
 
-  constructor(descricao: string, tipo: TipoResposta = TipoResposta.MultiplaEscolha, opcoes: OpcaoResposta[] = []){
+  constructor(descricao: string, tipo: TipoResposta = TipoResposta.MultiplaEscolha, opcoes: OpcaoResposta[] = [], idOrganizacao: number){
     super();
     this.descricao = descricao;
     this.tipoResposta = tipo;
     this.opcoesResposta = opcoes;
+    this.idOrganizacao = idOrganizacao;
   }
 
   possuiOpcoes() : boolean {

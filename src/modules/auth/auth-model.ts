@@ -1,3 +1,4 @@
+import { Organizacao } from "../organizacao/organizacao-model";
 
 export class Auth {
 
@@ -5,7 +6,7 @@ export class Auth {
   login: string = '';
   nome: string = '';
   administrador: boolean = false;
-  idOrganizacao: number = 0;
+  organizacao: any = null;
   validade: string = '1d';
   token: string = '';
 

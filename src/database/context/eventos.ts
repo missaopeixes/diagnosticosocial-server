@@ -6,6 +6,7 @@ import {
 export interface EventosAttributes {
     id : number;
     nome ? : string;
+    idOrganizacao: number
 
 }
 
@@ -15,12 +16,14 @@ export interface EventosInstance {
     updatedAt: Date;
 
     nome: string;
+    idOrganizacao: number
 
 }
 
 export default (sequelize: Sequelize, DataTypes: DataTypes) => {
     var eventos = sequelize.define('eventos', {
-        nome: DataTypes.STRING
+        nome: DataTypes.STRING,
+        idOrganizacao: DataTypes.INTEGER
     });
 
     eventos.associate = function(models) {

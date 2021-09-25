@@ -9,7 +9,9 @@ module.exports = {
      * Incluindo organização padrão.
     */
     await queryInterface.bulkInsert('organizacoes', [{
-      nome: 'Missão Peixes'
+      nome: 'Missão Peixes',
+      createdAt: now,
+      updatedAt: now
     }], {});
 
     /**
@@ -21,9 +23,9 @@ module.exports = {
       administrador: true,
       email: 'dev.missaopeixes@gmail.com',
       senha: '$2b$10$llBT2.2gv9IhpDiLhUzrJu6E.4hHHC6dxwurtguyqIv5bJDtrLf1u', // 1234
+      idOrganizacao: 1,
       createdAt: now,
-      updatedAt: now,
-      idOrganizacao: 1
+      updatedAt: now
     }], {});
   },
 

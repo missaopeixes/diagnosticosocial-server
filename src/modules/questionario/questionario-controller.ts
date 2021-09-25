@@ -7,9 +7,12 @@ import { Pergunta } from '../pergunta/pergunta-model';
 import { Questionario } from './questionario-model';
 
 export function criar(req: Request, res: Response) {
+  const usuario = HttpUtils.getUserSession(req);
+
   service.criar(new Questionario(
     req.body.nome,
-    req.body.perguntas
+    req.body.perguntas,
+    usuario.idOrganizacao
   )).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
@@ -53,7 +56,9 @@ export function listar(req: Request, res: Response) {
     return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
   }
 
-  service.listar(paginacao.pagina, paginacao.itensPorPagina).then(result => {
+  const usuario = HttpUtils.getUserSession(req);
+
+  service.listar(paginacao.pagina, paginacao.itensPorPagina, usuario.idOrganizacao).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -68,7 +73,9 @@ export function listar(req: Request, res: Response) {
 
 export function listarTodos(req: Request, res: Response) {
 
-  service.listarTodos().then(result => {
+  const usuario = HttpUtils.getUserSession(req);
+
+  service.listarTodos(usuario.idOrganizacao).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -87,7 +94,9 @@ export function obterPerguntas(req: Request, res: Response) {
 
   if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
 
-  service.obterPerguntas(id).then(result => {
+  const usuario = HttpUtils.getUserSession(req);
+
+  service.obterPerguntas(id, usuario.idOrganizacao).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -144,9 +153,11 @@ export function criarPergunta(req: Request, res: Response) {
 
   if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
 
+  const usuario = HttpUtils.getUserSession(req);
+
   service.criarPergunta(
     id,
-    new Pergunta(req.body.pergunta)
+    new Pergunta(req.body.pergunta, null, null, usuario.idOrganizacao)
   ).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {

@@ -6,6 +6,7 @@ import {
 export interface QuestionariosAttributes {
     nome ? : string;
     id: number;
+    idOrganizacao: number;
 }
 
 export interface QuestionariosInstance {
@@ -14,12 +15,14 @@ export interface QuestionariosInstance {
     updatedAt: Date;
 
     nome: string;
+    idOrganizacao: number;
 
 }
 
 export default (sequelize: Sequelize, DataTypes: DataTypes) => {
     var questionarios = sequelize.define('questionarios', {
-        nome: DataTypes.STRING(100)
+        nome: DataTypes.STRING(100),
+        idOrganizacao: DataTypes.INTEGER
     });
 
     questionarios.associate = (models) => { // param: models

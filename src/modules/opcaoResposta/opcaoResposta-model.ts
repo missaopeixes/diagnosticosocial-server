@@ -1,5 +1,5 @@
 
-import { MaxLength, IsDefined } from 'class-validator';
+import { MaxLength, IsDefined, IsInt } from 'class-validator';
 import { BaseModel } from '../../commom/base-model';
 
 export class OpcaoResposta extends BaseModel {
@@ -8,8 +8,12 @@ export class OpcaoResposta extends BaseModel {
   @MaxLength(255, {message: 'O campo descrição deve ter no máximo 255 caracteres.'})
   descricao: string;
 
-  constructor(descricao: string){
+  @IsInt({message: 'O campo idOrganizacao deve conter um número inteiro.'})
+  idOrganizacao: number;
+
+  constructor(descricao: string, idOrganizacao: number){
     super();
     this.descricao = descricao;
+    this.idOrganizacao = idOrganizacao;
   }
 }

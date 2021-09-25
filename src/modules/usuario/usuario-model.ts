@@ -1,5 +1,5 @@
 
-import { MaxLength, validate, IsEmail, IsBoolean, IsString } from 'class-validator';
+import { MaxLength, validate, IsEmail, IsBoolean, IsString, IsInt } from 'class-validator';
 import { BaseModel } from '../../commom/base-model';
 
 export class Usuario extends BaseModel {
@@ -23,6 +23,7 @@ export class Usuario extends BaseModel {
   @IsBoolean({message: 'O campo administrador deve conter um boleano.'})
   administrador: boolean;
   
+  @IsInt({message: 'O campo idOrganizacao deve conter um número inteiro.'})
   idOrganizacao: number;
 
   constructor(){

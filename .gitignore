@@ -1,4 +1,5 @@
 node_modules
 dist
 src/database/config/db-connection.json
+src/database/migrations/compiled
 enviroment.ts

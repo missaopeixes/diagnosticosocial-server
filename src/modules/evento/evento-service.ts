@@ -10,12 +10,14 @@ import { Resposta } from '../resposta/resposta-model';
 import _ = require('lodash');
 import { QuestionarioRespondido } from '../questionario/questionario-model';
 import { Sequelize } from 'sequelize-typescript';
+import { HttpUtils } from '../../utils/http-utils';
 
 const ITENS_POR_PAGINA = 15;
 
-function _verificaNomeExistente(nome: string, id?: number) : Promise<boolean> {
+function _verificaNomeExistente(nome: string, idOrganizacao: number, id?: number) : Promise<boolean> {
   let where = {
-    nome: nome
+    nome: nome,
+    idOrganizacao: idOrganizacao
   };
 
   if (!!id) {
@@ -47,7 +49,7 @@ export function criar(evento: Evento) : Promise<ResultadoServico> {
           return dbResolve(new ResultadoServico(erros, StatusServico.Erro));
         }
 
-        return _verificaNomeExistente(evento.nome).then(nomeExistente => {
+        return _verificaNomeExistente(evento.nome, evento.idOrganizacao).then(nomeExistente => {
 
           if (nomeExistente) {
             return dbResolve(new ResultadoServico('Já existe um evento com este nome.', StatusServico.Erro));
@@ -81,15 +83,15 @@ export function criar(evento: Evento) : Promise<ResultadoServico> {
   });
 };
 
-export function listar(pagina: number = 1, itensPorPagina: number = 15) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15, idOrganizacao: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
-    db.eventos.findAll(crudUtils.montarPaginacao(pagina, itensPorPagina)).then(resp => {
+    db.eventos.findAll(crudUtils.montarPaginacaoPorOrg(pagina, itensPorPagina, idOrganizacao)).then(resp => {
 
       return crudUtils.montarConteudoPagina(resp, pagina, itensPorPagina);
     })
     .then((resultado) => {
-      db.eventos.count().then((count) => {
+      db.eventos.count({where: {idOrganizacao: idOrganizacao}}).then((count) => {
         resultado.total = count;
         return resolve(new ResultadoServico(resultado));
       });
@@ -105,7 +107,7 @@ export function obter(id: number) : Promise<ResultadoServico> {
 
     db.eventos.findOne({
       where: {
-        id: id,
+        id: id
       },
       include: [{
         model: db.eventosQuestionarios,
@@ -121,10 +123,10 @@ export function obter(id: number) : Promise<ResultadoServico> {
   });
 };
 
-export function obterTodos() : Promise<ResultadoServico> {
+export function obterTodos(idOrganizacao: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
-    db.eventos.findAll()
+    db.eventos.findAll({where: {idOrganizacao: idOrganizacao}})
     .then(resp => {
       resolve(new ResultadoServico(resp));
     })

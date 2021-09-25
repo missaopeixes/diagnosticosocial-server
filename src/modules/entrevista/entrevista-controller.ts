@@ -144,6 +144,8 @@ export function listar(req: Request, res: Response) {
 
   let paginacao = new PaginacaoHttp(req);
 
+  const usuario = HttpUtils.getUserSession(req);
+
   if (paginacao.temErro) {
     return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
   }
@@ -182,7 +184,9 @@ export function listar(req: Request, res: Response) {
       nome: req.query.filtroNome,
       concluidas: concluidas === 'true',
       emAndamento: emAndamento === 'true'
-    }).then(result => {
+    },
+    usuario.idOrganizacao
+    ).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)

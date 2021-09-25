@@ -1,8 +1,6 @@
 
-import { MaxLength, IsDefined, IsString } from 'class-validator';
-import { Is } from 'sequelize-typescript';
+import { MaxLength, IsDefined, IsString, IsInt } from 'class-validator';
 import { BaseModel } from '../../commom/base-model';
-import { Questionario } from '../questionario/questionario-model';
 
 export enum QtdQuestionarioPorEnquete {
   apenasUm = 1,
@@ -22,13 +20,17 @@ export class Evento extends BaseModel {
   @MaxLength(255, {message: 'O campo nome deve ter no máximo 255 caracteres.'})
   @IsString({message: 'O campo nome deve conter um texto.'})
   nome: string;
-
+  
   @IsDefined({message: 'O campo questionarios é obrigatório.'})
   questionarios: QuestionarioDoEvento[];
 
-  constructor(nome: string, questionarios?: QuestionarioDoEvento[]){
+  @IsInt({message: 'O campo idOrganizacao deve conter um número inteiro.'})
+  idOrganizacao: number;
+
+  constructor(nome: string, questionarios?: QuestionarioDoEvento[], idOrganizacao: number = 0){
     super();
     this.nome = nome;
     this.questionarios = questionarios || [];
+    this.idOrganizacao = idOrganizacao;
   }
 }

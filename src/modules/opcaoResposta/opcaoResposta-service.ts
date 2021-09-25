@@ -2,10 +2,10 @@ import { ResultadoServico, StatusServico, TipoErro } from "../../commom/resultad
 import { OpcaoResposta } from "./opcaoResposta-model";
 import db from '../../database/db-connection';
 
-export function criar(descricao: string) : Promise<ResultadoServico> {
+export function criar(descricao: string, idOrganizacao: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
-    const opcaoResposta = new OpcaoResposta(descricao);
+    const opcaoResposta = new OpcaoResposta(descricao, idOrganizacao);
 
     opcaoResposta.validar().then(erros => {
 
@@ -15,6 +15,7 @@ export function criar(descricao: string) : Promise<ResultadoServico> {
 
       db.opcoesResposta.find({
         where: {
+          idOrganizacao: idOrganizacao,
           descricao: descricao
         }
       }).then((busca) => {
@@ -38,11 +39,12 @@ export function criar(descricao: string) : Promise<ResultadoServico> {
   });
 };
 
-export function pesquisar(termo: string) : Promise<ResultadoServico> {
+export function pesquisar(termo: string, idOrganizacao: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     db.opcoesResposta.findAll({
       where: {
+        idOrganizacao: idOrganizacao,
         descricao: {
           $like: `%${termo}%`
         }

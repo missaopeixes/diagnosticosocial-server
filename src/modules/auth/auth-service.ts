@@ -34,30 +34,50 @@ export function signin(login: string, senha: string) : Promise<ResultadoServico>
         login: login
       }
     })
-    .then(resp => {
+    .then(usuario => {
 
-      if (!resp || !resp.id) {
+      if (!usuario || !usuario.id) {
         return resolve(new ResultadoServico('Credenciais inválidas.', StatusServico.Erro, TipoErro.Autenticacao));
       }
 
-      bcrypt.compare(senha, resp.senha, (err, isMatch) => {
-        if (err) throw err;
+      db.organizacoes.findOne({
+        where: {
+          id: usuario.idOrganizacao
+        }
+      })
+      .then(org => {
 
-        if (!isMatch) {
-          return resolve(new ResultadoServico('Credenciais inválidas, senha inválida.', StatusServico.Erro, TipoErro.Autenticacao));
+        if (!org) {
+          return resolve(new ResultadoServico('Organização não encontrada.', StatusServico.Erro, TipoErro.Autenticacao));
         }
 
-        const token = jwt.sign({data: resp}, serverConf.jwt.secret, {expiresIn: serverConf.jwt.expiresIn});
+        bcrypt.compare(senha, usuario.senha, (err, isMatch) => {
+          if (err) throw err;
 
-        resolve(new ResultadoServico(new Auth({
-          login,
-          id: resp.id,
-          nome: resp.nome,
-          administrador: resp.administrador,
-          idOrganizacao: resp.idOrganizacao,
-          validade: serverConf.jwt.expiresIn,
-          token
-        })));
+          if (!isMatch) {
+            return resolve(new ResultadoServico('Credenciais inválidas, senha inválida.', StatusServico.Erro, TipoErro.Autenticacao));
+          }
+
+          const token = jwt.sign({data: usuario}, serverConf.jwt.secret, {expiresIn: serverConf.jwt.expiresIn});
+
+          resolve(new ResultadoServico(new Auth({
+            login,
+            id: usuario.id,
+            nome: usuario.nome,
+            administrador: usuario.administrador,
+            organizacao: {
+              id: org.id,
+              nome: org.nome,
+              createdAt: org.createdAt,
+              updatedAt: org.updatedAt
+            },
+            validade: serverConf.jwt.expiresIn,
+            token,
+          })));
+        });
+      })
+      .catch(err => {
+        reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
       });
     })
     .catch(err => {
@@ -82,7 +102,7 @@ export function cadastrar(nomeOrganizacao: string, nome: string, login: string, 
         
         db.organizacoes.find({where: {nome: organizacao.nome}}).then((lista) => {
           if (!!lista) return dbResolve(new ResultadoServico('Este nome já está sendo utilizado para a Organização!', StatusServico.Erro));
-  
+          
           db.organizacoes.create(organizacao, {transaction: t}).then(resp => {
 
             const usuario = new Usuario();
@@ -122,6 +142,7 @@ export function cadastrar(nomeOrganizacao: string, nome: string, login: string, 
                       db.usuarios.create(usuario).then(resp => {
                         if (!resp) {t.rollback(); return resolve(new ResultadoServico('Ocorreu um erro ao cadastrar o Usuário.', StatusServico.Erro));}
 
+                        t.commit();
                         return resolve(new ResultadoServico('Cadastro realizado com sucesso!'));
                       });
                     });

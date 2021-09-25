@@ -15,6 +15,14 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.TINYINT
             },
+            idOrganizacao: {
+                type: Sequelize.INTEGER,
+                references: {
+                    model: 'organizacoes',
+                    key: 'id',
+                },
+                allowNull: false
+            },
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE

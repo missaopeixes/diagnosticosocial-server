@@ -3,7 +3,7 @@ const ts = require('gulp-typescript');
 const nodemon = require('gulp-nodemon');
 
 const tsMainProject = ts.createProject('tsconfig.json');
-const tsMigrationProject = ts.createProject('src/database/config/ts-migrations.json');
+const tsMigrationProject = ts.createProject('./src/database/config/ts-migrations.json');
 
 const ASSETS_FILES = ['src/*.json', 'src/**/*.json', 'src/**/*.html'];
 

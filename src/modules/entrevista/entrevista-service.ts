@@ -201,47 +201,39 @@ export function atualizarQuestionarioRespondido(questionario: QuestionarioRespon
 
 
 
-export function listar(pagina: number = 1, itensPorPagina: number = 15, filtro: FiltroEntrevista) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15, filtro: FiltroEntrevista, idOrganizacao: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     const qtd = itensPorPagina || 15;
 
-    let filtroQuery = 'WHERE ';
+    let filtroQuery = `WHERE ev.idOrganizacao = ${idOrganizacao}`;
     if (filtro.concluidas && filtro.emAndamento) {
       //Sem filtro para conclusão de entrevistas
     }
     if (filtro.concluidas && !filtro.emAndamento) {
-      filtroQuery = filtroQuery.concat(`e.concluida = true `);
+      filtroQuery = filtroQuery.concat(` AND e.concluida = true `);
     }
     if (!filtro.concluidas && filtro.emAndamento) {
-      filtroQuery = filtroQuery.concat(`e.concluida = false `);
+      filtroQuery = filtroQuery.concat(` AND e.concluida = false `);
     }
 
     if (!!filtro.idUsuario) {
-      filtroQuery = filtroQuery != 'WHERE ' ?
-        filtroQuery.concat(`AND u.id = ${filtro.idUsuario} `) :
-        filtroQuery.concat(`u.id = ${filtro.idUsuario} `);
+      filtroQuery.concat(`AND u.id = ${filtro.idUsuario} `)
     }
     if (!!filtro.evento) {
-      filtroQuery = filtroQuery != 'WHERE ' ?
-        filtroQuery.concat(`AND ev.nome LIKE '%${filtro.evento}%' `) :
-        filtroQuery.concat(`ev.nome LIKE '%${filtro.evento}%' `);
+      filtroQuery.concat(`AND ev.nome LIKE '%${filtro.evento}%' `)
     }
     if (!!filtro.usuario) {
-      filtroQuery = filtroQuery != 'WHERE ' ?
-        filtroQuery.concat(`AND u.nome LIKE '%${filtro.usuario}%' `) :
-        filtroQuery.concat(`u.nome LIKE '%${filtro.usuario}%' `);
+      filtroQuery.concat(`AND u.nome LIKE '%${filtro.usuario}%' `)
     }
     if (!!filtro.nome) {
-      filtroQuery = filtroQuery != 'WHERE ' ?
-        filtroQuery.concat(`AND e.nome LIKE '%${filtro.nome}%' `) :
-        filtroQuery.concat(`e.nome LIKE '%${filtro.nome}%' `);
+      filtroQuery.concat(`AND e.nome LIKE '%${filtro.nome}%' `)
     }
 
     const queryBody = `FROM entrevistas e
       LEFT JOIN eventos ev ON ev.id = e.idEvento
       LEFT JOIN usuarios u ON u.id = e.idUsuario
-      ${filtroQuery == 'WHERE ' ? '' : filtroQuery}
+      ${filtroQuery}
       ORDER BY e.concluida, e.createdAt DESC`;
     const queryRaw = `SELECT e.*, ev.nome AS evento, u.nome AS usuario ${queryBody} LIMIT ${(pagina - 1) * qtd}, ${qtd};`;
     const queryCount = `SELECT COUNT(e.id) as total ${queryBody}`;

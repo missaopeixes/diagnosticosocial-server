@@ -57,11 +57,13 @@ export function listar(req: Request, res: Response) {
 
   let paginacao = new PaginacaoHttp(req);
 
+  const usuario = HttpUtils.getUserSession(req);
+
   if (paginacao.temErro) {
     return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
   }
 
-  service.listar(paginacao.pagina, paginacao.itensPorPagina).then(result => {
+  service.listar(paginacao.pagina, paginacao.itensPorPagina, usuario.idOrganizacao).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -94,8 +96,7 @@ export function obter(req: Request, res: Response) {
 };
 
 export function perfil(req: Request, res: Response) {
-  const token : string = req.headers['authorization'].toString().replace('Bearer ', '');
-  const usuario = jwt.verify(token, serverConf.jwt.secret)['data'] as Usuario;
+  const usuario = HttpUtils.getUserSession(req);
 
   service.obter(usuario.id).then(result => {
 
@@ -111,8 +112,7 @@ export function perfil(req: Request, res: Response) {
 };
 
 export function alterarSenha(req: Request, res: Response) {
-  const token : string = req.headers['authorization'].toString().replace('Bearer ', '');
-  const usuario = jwt.verify(token, serverConf.jwt.secret)['data'] as Usuario;
+  const usuario = HttpUtils.getUserSession(req);
 
   let senhaAtual = req.body.senhaAtual;
   let senhaNova = req.body.senhaNova;
@@ -134,8 +134,7 @@ export function alterarSenha(req: Request, res: Response) {
 };
 
 export function excluir(req: Request, res: Response) {
-  const token : string = req.headers['authorization'].toString().replace('Bearer ', '');
-  const usuario = jwt.verify(token, serverConf.jwt.secret)['data'] as Usuario;
+  const usuario = HttpUtils.getUserSession(req);
 
   let id = parseInt(req.params.id);
 

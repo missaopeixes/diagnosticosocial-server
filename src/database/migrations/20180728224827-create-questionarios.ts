@@ -17,6 +17,15 @@ export = {
                 type: Sequelize.STRING(100)
             },
 
+            idOrganizacao: {
+              type: Sequelize.INTEGER,
+              references: {
+                  model: 'organizacoes',
+                  key: 'id',
+              },
+              allowNull: false
+          },
+
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE

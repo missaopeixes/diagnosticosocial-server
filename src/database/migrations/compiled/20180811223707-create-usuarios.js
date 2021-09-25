@@ -17,6 +17,14 @@ module.exports = {
             senha: {
                 type: Sequelize.STRING
             },
+            idOrganizacao: {
+                type: Sequelize.INTEGER,
+                references: {
+                    model: 'organizacoes',
+                    key: 'id',
+                },
+                allowNull: false
+            },
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE

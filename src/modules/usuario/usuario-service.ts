@@ -85,10 +85,10 @@ export function editar(idUsuario: number, nome: string, login: string, email: st
   });
 };
 
-export function listar(pagina: number = 1, itensPorPagina: number = 15) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15, idOrganizacao?: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
-    db.usuarios.findAll(crudUtils.montarPaginacao(pagina, itensPorPagina))
+    db.usuarios.findAll(crudUtils.montarPaginacaoPorOrg(pagina, itensPorPagina, idOrganizacao))
     .then(resp => {
       const lista = resp.map((u) => {
         delete u.senha;
@@ -98,7 +98,7 @@ export function listar(pagina: number = 1, itensPorPagina: number = 15) : Promis
       return crudUtils.montarConteudoPagina(lista, pagina, itensPorPagina);
     })
     .then((resultado) => {
-      db.usuarios.count().then((count) => {
+      db.usuarios.count({where: {idOrganizacao: idOrganizacao}}).then((count) => {
         resultado.total = count;
         return resolve(new ResultadoServico(resultado));
       });

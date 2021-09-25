@@ -14,9 +14,10 @@ import { OpcaoResposta } from '../opcaoResposta/opcaoResposta-model';
 
 const ITENS_POR_PAGINA = 15;
 
-function _verificaNomeExistente(nome: string, id?: number) : Promise<boolean> {
+function _verificaNomeExistente(nome: string, idOrganizacao: number, id?: number) : Promise<boolean> {
   let where = {
-    nome: nome
+    nome: nome,
+    idOrganizacao: idOrganizacao
   };
 
   if (!!id) {
@@ -48,7 +49,7 @@ export function criar(questionario: Questionario) : Promise<ResultadoServico> {
           return dbResolve(new ResultadoServico(erros, StatusServico.Erro));
         }
 
-        return _verificaNomeExistente(questionario.nome).then(nomeExistente => {
+        return _verificaNomeExistente(questionario.nome, questionario.idOrganizacao).then(nomeExistente => {
 
           if (nomeExistente) {
             return dbResolve(new ResultadoServico('Já existe um questionário com este nome.', StatusServico.Erro));
@@ -82,15 +83,15 @@ export function criar(questionario: Questionario) : Promise<ResultadoServico> {
   });
 };
 
-export function listar(pagina: number = 1, itensPorPagina: number = 15) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15, idOrganizacao: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
-    db.questionarios.findAll(crudUtils.montarPaginacao(pagina, itensPorPagina)).then(resp => {
+    db.questionarios.findAll(crudUtils.montarPaginacaoPorOrg(pagina, itensPorPagina, idOrganizacao)).then(resp => {
 
       return crudUtils.montarConteudoPagina(resp, pagina, itensPorPagina);
     })
     .then((resultado) => {
-      db.questionarios.count().then((count) => {
+      db.questionarios.count({where: {idOrganizacao: idOrganizacao}}).then((count) => {
         resultado.total = count;
         return resolve(new ResultadoServico(resultado));
       });
@@ -101,10 +102,10 @@ export function listar(pagina: number = 1, itensPorPagina: number = 15) : Promis
   });
 };
 
-export function listarTodos() : Promise<ResultadoServico> {
+export function listarTodos(idOrganizacao: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
-    db.questionarios.findAll().then((resultado) => resolve(new ResultadoServico(resultado)))
+    db.questionarios.findAll({where: {idOrganizacao: idOrganizacao}}).then((resultado) => resolve(new ResultadoServico(resultado)))
     .catch(err => {
       reject(new ResultadoServico(err, StatusServico.Erro, TipoErro.Excecao));
     });
@@ -135,7 +136,7 @@ export function obter(id: number) : Promise<ResultadoServico> {
   });
 };
 
-export function obterPerguntas(id: number) : Promise<ResultadoServico> {
+export function obterPerguntas(id: number, idOrganizacao: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     db.sequelize.query(
@@ -145,7 +146,7 @@ export function obterPerguntas(id: number) : Promise<ResultadoServico> {
       LEFT JOIN perguntas p ON p.id = qp.idPergunta
       LEFT JOIN perguntasOpcoesResposta pop ON pop.idPergunta = p.id
       LEFT JOIN opcoesResposta op ON op.id = pop.idOpcaoResposta
-      WHERE q.id = ${id}
+      WHERE q.id = ${id} AND q.idOrganizacao = ${idOrganizacao}
       ORDER BY qp.ordem, pop.ordem
       ;`, {raw: true, type: Sequelize.QueryTypes.SELECT})
     .then(resp => {
@@ -154,11 +155,11 @@ export function obterPerguntas(id: number) : Promise<ResultadoServico> {
 
       let perguntas: Pergunta[] =
         list.map(p => {
-          let pergunta = new Pergunta(p[0].pergunta, parseInt(p[0].tipoResposta));
+          let pergunta = new Pergunta(p[0].pergunta, parseInt(p[0].tipoResposta), null, p[0].idOrganizacao);
           pergunta.id = p[0].idPergunta;
 
           pergunta.opcoesResposta = p.map((item) => {
-            let op = new OpcaoResposta(item.opcaoResposta);
+            let op = new OpcaoResposta(item.opcaoResposta, item.idOrganizacao);
             op.id = item.idOpcaoResposta;
             return op;
           });
@@ -189,7 +190,7 @@ export function atualizar(id: number, questionario: Questionario) : Promise<Resu
           return dbResolve(new ResultadoServico('Questionário não encontrado', StatusServico.Erro));
         }
 
-        return _verificaNomeExistente(questionario.nome, id).then(nomeExistente => {
+        return _verificaNomeExistente(questionario.nome, questionario.idOrganizacao, id).then(nomeExistente => {
 
           if (nomeExistente) {
             return dbResolve(new ResultadoServico('Já existe um questionário com este nome.', StatusServico.Erro));

@@ -6,20 +6,23 @@ import {
 export interface OpcoesRespostaAttributes {
     descricao ? : string;
     id: number;
-}
-
-export interface OpcoesRespostaInstance {
+    idOrganizacao: number;
+  }
+  
+  export interface OpcoesRespostaInstance {
     id: number;
     createdAt: Date;
     updatedAt: Date;
-
+    
     descricao: string;
+    idOrganizacao: number;
 
 }
 
 export default (sequelize: Sequelize, DataTypes: DataTypes) => {
     var opcoesResposta = sequelize.define('opcoesResposta', {
-        descricao: DataTypes.STRING
+        descricao: DataTypes.STRING,
+        idOrganizacao: DataTypes.INTEGER
     });
 
     opcoesResposta.associate = function(models) {

@@ -7,21 +7,24 @@ export interface PerguntasAttributes {
     descricao ? : string;
     tipoResposta ? : number;
     id: number;
-}
-
-export interface PerguntasInstance {
+    idOrganizacao: number;
+  }
+  
+  export interface PerguntasInstance {
     id: number;
     createdAt: Date;
     updatedAt: Date;
-
+    
     descricao: string;
     tipoResposta: number;
+    idOrganizacao: number;
 }
 
 export default (sequelize: Sequelize, DataTypes: DataTypes) => {
     var perguntas = sequelize.define('perguntas', {
         descricao: DataTypes.STRING,
-        tipoResposta: DataTypes.SMALLINT
+        tipoResposta: DataTypes.SMALLINT,
+        idOrganizacao: DataTypes.INTEGER
     });
 
     perguntas.associate = function(models) {

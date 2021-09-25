@@ -10,9 +10,12 @@ import * as jwt from 'jsonwebtoken';
 const serverConf = require('../../server.json');
 
 export function criar(req: Request, res: Response) {
+  const usuario = HttpUtils.getUserSession(req);
+
   service.criar(new Evento(
     req.body.nome,
-    req.body.questionarios
+    req.body.questionarios,
+    usuario.idOrganizacao
   )).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
@@ -51,7 +54,9 @@ export function listar(req: Request, res: Response) {
     return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
   }
 
-  service.listar(paginacao.pagina, paginacao.itensPorPagina).then(result => {
+  const usuario = HttpUtils.getUserSession(req);
+
+  service.listar(paginacao.pagina, paginacao.itensPorPagina, usuario.idOrganizacao).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -80,7 +85,10 @@ export function obter(req: Request, res: Response) {
 };
 
 export function obterTodos(req: Request, res: Response) {
-  service.obterTodos().then(result => {
+
+  const usuario = HttpUtils.getUserSession(req);
+
+  service.obterTodos(usuario.idOrganizacao).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)

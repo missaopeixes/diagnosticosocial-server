@@ -21,6 +21,7 @@ export function criar(pergunta: Pergunta) : Promise<ResultadoServico> {
 
         return db.perguntas.find({
           where: {
+            idOrganizacao: pergunta.idOrganizacao,
             descricao: pergunta.descricao
           }
         }).then((busca) => {
@@ -70,30 +71,34 @@ export function criar(pergunta: Pergunta) : Promise<ResultadoServico> {
   });
 };
 
-export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroDescricao?: string, filtroNaoUtilizadas?: boolean) : Promise<ResultadoServico> {
+export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroDescricao?: string, filtroNaoUtilizadas?: boolean, idOrganizacao?: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     const qtd = itensPorPagina || 15;
 
     let filtro = '';
+    let where = `WHERE p.idOrganizacao = ${idOrganizacao}`;
 
     if (filtroNaoUtilizadas) {
-      filtro += 'LEFT JOIN questionarioPerguntas qp ON p.id = qp.idPergunta WHERE qp.id IS NULL';
+      where += ' AND qp.id IS NULL';
+      filtro += 'LEFT JOIN questionarioPerguntas qp ON p.id = qp.idPergunta ';
     }
 
     if (!!filtroDescricao) {
-      filtro += (filtroNaoUtilizadas ? ' AND' : ' WHERE') + ` p.descricao LIKE '%${filtroDescricao}%'`;
+      where += ` AND p.descricao LIKE '%${filtroDescricao}%'`;
     }
 
     const queryRaw = `
       SELECT p.* FROM perguntas p
       ${filtro}
+      ${where}
       GROUP BY p.id
       ORDER BY p.createdAt DESC
       LIMIT ${(pagina - 1) * qtd}, ${qtd};`;
-    const queryCount = `
+      const queryCount = `
       SELECT COUNT(DISTINCT p.id) as total FROM perguntas p
-      ${filtro}`;
+      ${filtro} 
+      ${where}`;
 
     db.sequelize.query(queryRaw, { model: db.perguntas })
     .then(data => crudUtils.montarConteudoPagina(data, pagina, itensPorPagina))
@@ -109,11 +114,12 @@ export function listar(pagina: number = 1, itensPorPagina: number = 15, filtroDe
   });
 };
 
-export function pesquisar(termo: string) : Promise<ResultadoServico> {
+export function pesquisar(termo: string, idOrganizacao: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     db.perguntas.findAll({
       where: {
+        idOrganizacao: idOrganizacao,
         descricao: {
           $like: `%${termo}%`
         }
@@ -396,7 +402,7 @@ export function desvincularResposta(idPergunta: number, idOpcaoResposta: number)
   });
 };
 
-export function criarResposta(idPergunta: number, descricao: string) : Promise<ResultadoServico>{
+export function criarResposta(idPergunta: number, descricao: string, idOrganizacao: number) : Promise<ResultadoServico>{
   return new Promise((resolve, reject) => {
 
     db.perguntas.findOne({
@@ -410,7 +416,7 @@ export function criarResposta(idPergunta: number, descricao: string) : Promise<R
         return resolve(new ResultadoServico('Pergunta não encontrada', StatusServico.Erro));
       }
 
-      opcaoRespostaService.criar(descricao).then(resultadoNovaResposta => {
+      opcaoRespostaService.criar(descricao, idOrganizacao).then(resultadoNovaResposta => {
 
         return vincularResposta(pergunta.id, resultadoNovaResposta.conteudo.id)
         .then(() => {

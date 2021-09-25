@@ -1,5 +1,5 @@
 
-import { MaxLength, IsDefined, IsNumber, IsString } from 'class-validator';
+import { MaxLength, IsDefined, IsNumber, IsInt, IsString } from 'class-validator';
 import { BaseModel } from '../../commom/base-model';
 import { Pergunta } from '../pergunta/pergunta-model';
 import { Resposta } from '../resposta/resposta-model';
@@ -13,10 +13,14 @@ export class Questionario extends BaseModel {
   @IsDefined({message: 'O campo perguntas é obrigatório.'})
   perguntas: Pergunta[];
 
-  constructor(nome: string, perguntas?: Pergunta[]){
+  @IsInt({message: 'O campo idOrganizacao deve conter um número inteiro.'})
+  idOrganizacao: number;
+
+  constructor(nome: string, perguntas?: Pergunta[], idOrganizacao: number = 0){
     super();
     this.nome = nome;
     this.perguntas = perguntas || [];
+    this.idOrganizacao = idOrganizacao;
   }
 }
 

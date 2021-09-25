@@ -6,11 +6,13 @@ import * as service from './pergunta-service';
 import { Pergunta } from './pergunta-model';
 
 export function criar(req: Request, res: Response) {
+  const usuario = HttpUtils.getUserSession(req);
 
   service.criar(new Pergunta(
     req.body.descricao,
     parseInt(req.body.tipoResposta),
-    req.body.opcoesResposta
+    req.body.opcoesResposta,
+    usuario.idOrganizacao
     )).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
@@ -30,7 +32,9 @@ export function atualizar(req: Request, res: Response) {
 
   if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
 
-  let obj = new Pergunta(req.body.descricao, req.body.tipoResposta, req.body.opcoesResposta);
+  const usuario = HttpUtils.getUserSession(req);
+
+  let obj = new Pergunta(req.body.descricao, req.body.tipoResposta, req.body.opcoesResposta, usuario.idOrganizacao);
   obj.id = id;
 
   service.atualizar(obj).then(resultado => {
@@ -60,11 +64,14 @@ export function listar(req: Request, res: Response) {
     return res.send(HttpUtils.statusCode(paginacao.tipoErro), paginacao.erro);
   }
 
+  const usuario = HttpUtils.getUserSession(req);
+
   service.listar(
     paginacao.pagina,
     paginacao.itensPorPagina,
     req.query.filtroDescricao,
-    req.query.filtroNaoUtilizadas
+    req.query.filtroNaoUtilizadas,
+    usuario.idOrganizacao
     ).then(result => {
 
     if (result.status === StatusServico.Erro) {
@@ -84,7 +91,9 @@ export function pesquisar(req: Request, res: Response) {
 
   if (typeof termo !== "string") return res.send(400, "termo deve ser um texto.");
 
-  service.pesquisar(termo).then(result => {
+  const usuario = HttpUtils.getUserSession(req);
+
+  service.pesquisar(termo, usuario.idOrganizacao).then(result => {
 
     if (result.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(result.tipoErro), result.conteudo)
@@ -143,7 +152,9 @@ export function criarResposta(req: Request, res: Response) {
   if (!Number.isInteger(id)) return res.send(400, "id deve ser um número.");
   if (typeof descricao !== "string") return res.send(400, "descricao deve ser um texto.");
 
-  service.criarResposta(id, descricao).then(resultado => {
+  const usuario = HttpUtils.getUserSession(req);
+
+  service.criarResposta(id, descricao, usuario.idOrganizacao).then(resultado => {
 
     if (resultado.status === StatusServico.Erro) {
       return res.send(HttpUtils.statusCode(resultado.tipoErro), resultado.conteudo);

@@ -183,7 +183,7 @@ function _montarImportacao(entrevistasPlanilha:any[], questionarios:Questionario
   }
 }
 
-export function importar() : Promise<ResultadoServico> {
+export function importar(idOrganizacao: number) : Promise<ResultadoServico> {
   return new Promise((resolve, reject) => {
 
     const sistema = {
@@ -192,7 +192,7 @@ export function importar() : Promise<ResultadoServico> {
 
     EventoService.obterQuestionarios(sistema.evento).then(rEvento => {
       Promise.all(
-        rEvento.conteudo.map(q => QuestionarioService.obterPerguntas(q.id))
+        rEvento.conteudo.map(q => QuestionarioService.obterPerguntas(q.id, idOrganizacao))
       )
       .then(resultPerguntas => {
 

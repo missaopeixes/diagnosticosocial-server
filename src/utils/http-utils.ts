@@ -1,5 +1,9 @@
 import { Request } from 'restify';
+import * as jwt from 'jsonwebtoken';
 import {TipoErro, ResultadoServico, StatusServico} from '../commom/resultado-servico';
+import { Usuario } from '../modules/usuario/usuario-model';
+
+const serverConf = require('./../server.json');
 
 export class HttpUtils {
 
@@ -25,5 +29,12 @@ export class HttpUtils {
     }
 
     return resultado;
+  }
+
+  static getUserSession(req: Request): Usuario {
+    const token : string = req.headers['authorization'].toString().replace('Bearer ', '');
+    const usuario = jwt.verify(token, serverConf.jwt.secret)['data'] as Usuario;
+
+    return usuario;
   }
 }
